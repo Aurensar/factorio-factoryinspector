@@ -42,6 +42,7 @@ local function onGameTick(event)
             if data.ui and data.ui.mainFrame and data.ui.mainFrame.visible then
                 local player = game.get_player(playerIndex)
                 productionTables.refresh(player)
+                itemList.refresh(player)
             end
         end
     end

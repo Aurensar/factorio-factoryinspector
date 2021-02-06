@@ -2,6 +2,7 @@
 Version: 1.0.9
 Date: ????
   Changes:
+    - Item list now refreshes in UI - wasn't picking up new items correctly
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.8
 Date: 2021-02-06
