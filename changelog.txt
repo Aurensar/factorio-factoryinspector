@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.8
-Date: ????
+Date: 2021-02-06
   Changes:
     - Fixes related to starting a brand new game with empty entities list
     - Take a dependency on flib to for some UI helpers
