@@ -1,0 +1,12 @@
+{
+  "name": "factory-inspector",
+  "version": "1.0.4",
+  "title": "Factory Inspector",
+  "author": "",
+  "contact": "",
+  "homepage": "",
+  "factorio_version": "1.1",
+  "dependencies": ["base >= 1.1"],
+  "description":
+    "Measures per-recipe consumption and production for all items. Want to know what's consuming all your green circuits? Designed for complex modded games where each item has many producers and consumers."
+}
