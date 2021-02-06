@@ -1,17 +1,15 @@
 
 local function log(string)
     if __DebugAdapter then
-        __DebugAdapter.print(string)
+        __DebugAdapter.print("[FI] "..string)
     end
-    --game.write_file("factoryinfo.log", string.."\n", true)
 end
 
 local function log2(string)
     if __DebugAdapter then
-        __DebugAdapter.print(string)
+        __DebugAdapter.print("[FI] "..string)
     end
-    game.print(string)
-    --game.write_file("factoryinfo.log", string.."\n", true)
+    game.print("[FI] "..string)
 end
 
 

@@ -27,9 +27,9 @@ local function init()
     -- Load standard partition configuration
     -- TODO make partitioning/performance management configurable
     global.global_partition_data = { current = 1, size = 0, max_size = 5}
-    global.am_partition_data = { current = 1, size = 0, max_size = 5}
-    global.md_partition_data = { current = 1, size = 0, max_size = 10}
-    global.furnace_partition_data = { current = 1, size = 0, max_size = 2}
+    global.am_partition_data = { current = 1, size = 0, max_size = 10}
+    global.md_partition_data = { current = 1, size = 0, max_size = 20}
+    global.furnace_partition_data = { current = 1, size = 0, max_size = 10}
 
     -- destroy old GUI
     for i, player in pairs(game.players) do

@@ -1,14 +1,13 @@
 local logger = require "script.logger"
 local results = require "script.results"
 
-local function getEntityProgress(entity)
-    if entity.type == "assembling-machine" and entity.crafting_progress then return entity.crafting_progress end
-    if entity.type == "mining-drill" and entity.mining_progress then return entity.mining_progress end
-end
-
 local current_am_partition = 1
 local current_furnace_partition = 1
 local current_md_partition = 1
+
+local am_start_tick = 1
+local furnace_start_tick = 1
+local md_start_tick = 1
 
 local function updateResults(item, recipe, amount, seconds, diff)
     global.results[item].consumed[recipe].times = global.results[item].consumed[recipe].times + diff
@@ -39,6 +38,8 @@ local function updateProductionAndConsumptionStatsAM()
     current_am_partition = current_am_partition + 1
     if current_am_partition > global.am_partition_data.current then
         current_am_partition = 1
+        logger.log(string.format("Finished updating %d assembling machine partitions in %d ticks", global.am_partition_data.current, (game.tick - am_start_tick)))
+        am_start_tick = game.tick
     end
 end
 
@@ -59,7 +60,8 @@ local function updateProductionAndConsumptionStatsFurnace()
     current_furnace_partition = current_furnace_partition + 1
     if current_furnace_partition > global.furnace_partition_data.current then
         current_furnace_partition = 1
-        --logger.log(string.format("Finished updating %d furnace partitions", global.furnace_partition_data.current))
+        logger.log(string.format("Finished updating %d furnace partitions in %d ticks", global.furnace_partition_data.current, (game.tick - furnace_start_tick)))
+        furnace_start_tick = game.tick
     end
 end
 
@@ -79,7 +81,8 @@ local function updateProductionAndConsumptionStatsMD()
     current_md_partition = current_md_partition + 1
     if current_md_partition > global.md_partition_data.current then
         current_md_partition = 1
-        --logger.log(string.format("Finished updating %d mining drill partitions", global.md_partition_data.current))
+        logger.log(string.format("Finished updating %d mining drill partitions in %d ticks", global.md_partition_data.current, (game.tick - md_start_tick)))
+        md_start_tick = game.tick
     end
 end
 

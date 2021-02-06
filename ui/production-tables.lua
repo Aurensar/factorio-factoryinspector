@@ -77,8 +77,8 @@ function productionTables.refreshConsumption(player)
     table.add { type = "label", caption = {"ui.total"}, style="bold_label" }
     table.add { type = "label", caption = string.format("%d", results.total.times), style="bold_label" }
     table.add { type = "label", caption = string.format("%d", results.total.amount), style="bold_label"}
-    table.add { type = "label", caption = string.format("%.1f", results.total.per_sec), style="bold_label" }
-    table.add { type = "label", caption = string.format("%.1f", results.total.per_min), style="bold_label" }
+    table.add { type = "label", caption = string.format("%d", results.total.per_sec), style="bold_label" }
+    table.add { type = "label", caption = string.format("%d", results.total.per_min), style="bold_label" }
     table.add { type = "label", caption = string.format("%d", 100), style="bold_label" }
 
     for recipe, data in pairs(results) do
@@ -87,8 +87,8 @@ function productionTables.refreshConsumption(player)
             table.add { type = "label", caption = name }
             table.add { type = "label", caption = string.format("%d", data.times) }
             table.add { type = "label", caption = string.format("%d", data.amount) }
-            table.add { type = "label", caption = string.format("%.1f", data.per_sec) }
-            table.add { type = "label", caption = string.format("%.1f", data.per_min) }
+            table.add { type = "label", caption = string.format("%d", data.per_sec) }
+            table.add { type = "label", caption = string.format("%d", data.per_min) }
             table.add { type = "label", caption = string.format("%d", (data.amount / results.total.amount * 100)) }
         end
     end
@@ -117,8 +117,8 @@ function productionTables.refreshProduction(player)
     table.add { type = "label", caption = {"ui.total"}, style="bold_label" }
     table.add { type = "label", caption = string.format("%d", results.total.times), style="bold_label" }
     table.add { type = "label", caption = string.format("%d", results.total.amount), style="bold_label"}
-    table.add { type = "label", caption = string.format("%.1f", results.total.per_sec), style="bold_label" }
-    table.add { type = "label", caption = string.format("%.1f", results.total.per_min), style="bold_label" }
+    table.add { type = "label", caption = string.format("%d", results.total.per_sec), style="bold_label" }
+    table.add { type = "label", caption = string.format("%d", results.total.per_min), style="bold_label" }
     table.add { type = "label", caption = string.format("%d", 100), style="bold_label" }
 
     for recipe, data in pairs(results) do
@@ -127,8 +127,8 @@ function productionTables.refreshProduction(player)
             table.add { type = "label", caption = name }
             table.add { type = "label", caption = string.format("%d", data.times) }
             table.add { type = "label", caption = string.format("%d", data.amount) }
-            table.add { type = "label", caption = string.format("%.1f", data.per_sec) }
-            table.add { type = "label", caption = string.format("%.1f", data.per_min) }
+            table.add { type = "label", caption = string.format("%d", data.per_sec) }
+            table.add { type = "label", caption = string.format("%d", data.per_min) }
             table.add { type = "label", caption = string.format("%d", (data.amount / results.total.amount * 100)) }
         end
     end

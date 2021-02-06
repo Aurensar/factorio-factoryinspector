@@ -2,6 +2,11 @@
 Version: 1.0.7
 Date: ????
   Changes:
+    - Added prefix to internal logs
+    - Removed some old production tracking code
+    - Reintroduced logging for time taken to get through all entity partitions, to debug performance in very large factories
+    - Increased default batch size as performance seems better than expected
+    - Removed decimal place formatting from production and consumption tables
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.6
 Date: 2021-02-06
