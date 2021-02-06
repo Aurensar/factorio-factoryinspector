@@ -2,6 +2,7 @@
 Version: 1.0.6
 Date: ????
   Changes:
+    - Fixed some UI styling issues that caused bad dependencies
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.5
 Date: 2021-02-06

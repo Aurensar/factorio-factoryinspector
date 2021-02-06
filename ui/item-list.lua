@@ -19,7 +19,7 @@ function renderItem(ui_state, item, selected_item)
     if ui_state.item_filter and not string.find(item, ui_state.item_filter) then return end
 
     local selected = (item == selected_item)
-    local style = (selected) and "fp_button_fake_listbox_item_active" or "fp_button_fake_listbox_item"
+    local style = (selected) and "fi_button_fake_listbox_item_active" or "fi_button_fake_listbox_item"
     local tooltip = {"", item, item}
     local name
     if game.item_prototypes[item] then name = game.item_prototypes[item].localised_name else name = game.fluid_prototypes[item].localised_name end

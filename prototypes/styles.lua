@@ -83,18 +83,17 @@ styles["fi_frame_bordered_stretch"] = {
     horizontally_stretchable = "on"
 }
 
-styles["fi_frame_semitransparent"] = {
-    type = "frame_style",
-    graphical_set = {
-        base = {
-            type = "composition",
-            filename = "__factoryplanner__/graphics/semitransparent_pixel.png",
-            corner_size = 1,
-            position = {0, 0}
-        }
-    }
-}
-
+-- styles["fi_frame_semitransparent"] = {
+--     type = "frame_style",
+--     graphical_set = {
+--         base = {
+--             type = "composition",
+--             filename = "__factoryplanner__/graphics/semitransparent_pixel.png",
+--             corner_size = 1,
+--             position = {0, 0}
+--         }
+--     }
+-- }
 
 styles["fi_table_production"] = {
     type = "table_style",
