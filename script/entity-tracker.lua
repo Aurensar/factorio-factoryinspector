@@ -89,10 +89,8 @@ local function checkEntityBatchForRecipeChanges()
         end
     end
 
-    local i = 0
     for number, data in pairs(global.entities[partition_being_checked]) do
         checkExistingEntityForChanges(data.entity, partition_being_checked)
-        i = i + 1
     end
 
     partition_being_checked = partition_being_checked + 1

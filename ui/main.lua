@@ -21,9 +21,9 @@ local function createHeader(player)
     label_hint.style.margin = {0, 0, 0, 8}
     label_hint.style.horizontally_squashable = true
 
-    --local drag_handle = titleBar.add{type="empty-widget", name="fi_main_drag_handle",
-    --    style="flib_titlebar_drag_handle", ignored_by_interaction=true}
-    --drag_handle.style.minimal_width = 80
+    local drag_handle = titleBar.add{type="empty-widget", name="fi_main_drag_handle",
+       style="flib_titlebar_drag_handle", ignored_by_interaction=true}
+    drag_handle.style.minimal_width = 80
 
     local separation = titleBar.add{type="line", direction="vertical"}
     separation.style.height = 24

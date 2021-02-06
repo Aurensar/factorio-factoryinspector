@@ -7,9 +7,13 @@ local function init()
     -- Reset the tracked entities
     global.entity_count = 0
     global.entities = {}
+    global.entities[1] = {}
     global.entities_am = {}
+    global.entities_am[1] = {}
     global.entities_md = {}
+    global.entities_md[1] = {}
     global.entities_furnace = {}
+    global.entities_furnace[1] = {}
 
     -- Reset the partition lookup tables
     global.entities_partition_lookup = {}
