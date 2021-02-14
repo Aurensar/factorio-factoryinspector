@@ -6,6 +6,28 @@ local partition_being_checked = 1
 
 local update_timer = 0
 
+local function removeEntityByNumber(number)
+    global.entities[global.entities_partition_lookup[number]][number] = nil
+    logger.log("Entity removed "..number)
+
+    if global.entities_am_partition_lookup[number] then
+        global.entities_am[global.entities_am_partition_lookup[number]][number] = nil
+    end
+    if global.entities_md_partition_lookup[number] then
+        global.entities_md[global.entities_md_partition_lookup[number]][number] = nil
+    end
+    if global.entities_furnace_partition_lookup[number] then
+        global.entities_furnace[global.entities_furnace_partition_lookup[number]][number] = nil
+    end
+
+    global.consumers[number] = {}
+    global.producers[number] = {}
+end
+
+local function removeEntity(entity)
+    removeEntityByNumber(entity.unit_number)
+end
+
 local function updateConsumersAndProducers(entity)
     global.consumers[entity.unit_number] = {}
     global.producers[entity.unit_number] = {}
@@ -90,7 +112,8 @@ local function checkEntityBatchForRecipeChanges()
     end
 
     for number, data in pairs(global.entities[partition_being_checked]) do
-        checkExistingEntityForChanges(data.entity, partition_being_checked)
+        if not data.entity.valid then removeEntityByNumber(number)
+        else checkExistingEntityForChanges(data.entity, partition_being_checked) end
     end
 
     partition_being_checked = partition_being_checked + 1
@@ -99,24 +122,6 @@ local function checkEntityBatchForRecipeChanges()
         --logger.log(string.format("Finished checking all %d partitions in %d ticks", global.global_partition_data.current, (game.tick - update_timer)))
         update_timer = game.tick
     end
-end
-
-local function removeEntity(entity)
-    global.entities[global.entities_partition_lookup[entity.unit_number]][entity.unit_number] = nil
-    logger.log("Entity removed "..entity.unit_number)
-
-    if entity.type == "assembling-machine" then
-        global.entities_am[global.entities_am_partition_lookup[entity.unit_number]][entity.unit_number] = nil
-    end
-    if entity.type == "mining-drill" then
-        global.entities_md[global.entities_md_partition_lookup[entity.unit_number]][entity.unit_number] = nil
-    end
-    if entity.type == "furnace" then
-        global.entities_furnace[global.entities_furnace_partition_lookup[entity.unit_number]][entity.unit_number] = nil
-    end
-
-    global.consumers[entity.unit_number] = {}
-    global.producers[entity.unit_number] = {}
 end
 
 return {

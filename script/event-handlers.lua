@@ -49,8 +49,11 @@ local function onGameTick(event)
     end
 
     if game.tick % 3600 == 0 then
-        logger.log2("Cleanup time")
         results.cleanupOldResults()
+    end
+
+    if game.tick % 300 == 0 then
+        results.flushBuffers()
     end
 end
 
@@ -76,9 +79,6 @@ local function onGuiTextChanged(event)
     itemList.refresh(player)
 end
 
-local function onGuiOpened(event)
-end
-
 local function onLuaShortcut(event)
     if event.prototype_name == "fi_open_interface" then
         local player = game.get_player(event.player_index)
@@ -92,6 +92,5 @@ return {
     onRemovedEntity = onRemovedEntity,
     onGuiClick = onGuiClick,
     onGuiTextChanged = onGuiTextChanged,
-    onLuaShortcut = onLuaShortcut,
-    onGuiOpened = onGuiOpened
+    onLuaShortcut = onLuaShortcut
   }  

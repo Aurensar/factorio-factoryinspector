@@ -1,7 +1,9 @@
 ---------------------------------------------------------------------------------------------------
-Version: 1.0.11
+Version: 1.1.0
 Date: ????
   Changes:
+    - Reorganisation of results database - now consolidates production stats every 5 sec. Should reduce the impact on save file size.
+    - Additional attempt to support mods that create/destroy entities in script. Still not fully working for mods that don't raise script_raised_built / script_raised_destroy
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.10
 Date: 2021-02-14

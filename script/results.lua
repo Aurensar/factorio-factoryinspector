@@ -1,5 +1,8 @@
 local logger = require "script.logger"
 
+local productionBuffer = {}
+local consumptionBuffer = {}
+
 local function getAggregateConsumption(item, timePeriodInSeconds)
     if not timePeriodInSeconds then timePeriodInSeconds = 60 end
     local startTick = game.tick - (timePeriodInSeconds * 60) 
@@ -53,18 +56,51 @@ local function getOrderedItemList()
 end
 
 local function addConsumptionData(item, recipe, times, amount)
-    table.insert(global.results[item].consumed[recipe], { tick = game.tick, times = times, amount = amount })
-    table.insert(global.results[item].consumed.total, { tick = game.tick, times = times, amount = amount })
-    if #global.results[item].consumed.total % 1000 == 0 then
-        -- local r = getAggregateConsumption(item, 60)
-        -- logger.log(string.format("Results collection for %s now contains %d items", item, #global.results[item].consumed.total))
-        -- logger.log(string.format("Production stats for %s: times crafted %d, amount %d, per sec %.2f, per min %.2f", item, r.total.times, r.total.amount, r.total.per_sec, r.total.per_min))
-    end
+    --table.insert(global.results[item].consumed[recipe], { tick = game.tick, times = times, amount = amount })
+    --table.insert(global.results[item].consumed.total, { tick = game.tick, times = times, amount = amount })
+
+    if not consumptionBuffer[item] then consumptionBuffer[item] = {} end
+    if not consumptionBuffer[item][recipe] then consumptionBuffer[item][recipe] = {} end
+    if not consumptionBuffer[item].total then consumptionBuffer[item].total = {} end
+    table.insert(consumptionBuffer[item][recipe], { tick = game.tick, times = times, amount = amount })
+    table.insert(consumptionBuffer[item].total, { tick = game.tick, times = times, amount = amount })
 end
 
 local function addProductionData(item, recipe, times, amount)
-    table.insert(global.results[item].produced[recipe], { tick = game.tick, times = times, amount = amount })
-    table.insert(global.results[item].produced.total, { tick = game.tick, times = times, amount = amount })
+    --table.insert(global.results[item].produced[recipe], { tick = game.tick, times = times, amount = amount })
+    --table.insert(global.results[item].produced.total, { tick = game.tick, times = times, amount = amount })
+
+    if not productionBuffer[item] then productionBuffer[item] = {} end
+    if not productionBuffer[item][recipe] then productionBuffer[item][recipe] = {} end
+    if not productionBuffer[item].total then productionBuffer[item].total = {} end
+    table.insert(productionBuffer[item][recipe], { tick = game.tick, times = times, amount = amount })
+    table.insert(productionBuffer[item].total, { tick = game.tick, times = times, amount = amount })
+end
+
+local function flushBuffer(buffer, getTargetDB)
+    local recordsInBuffer, recordsCreated = 0, 0
+    for item, itemDB in pairs(buffer) do
+        for recipe, recipeDB in pairs (itemDB) do
+            local consolidatedRecord = { times = 0, amount = 0}
+            for i, record in ipairs(recipeDB) do
+                consolidatedRecord.times = consolidatedRecord.times + record.times
+                consolidatedRecord.amount = consolidatedRecord.amount + record.amount
+                recordsInBuffer = recordsInBuffer + 1
+            end
+            recordsCreated = recordsCreated + 1
+            table.insert(getTargetDB(item, recipe), { tick = game.tick, times = consolidatedRecord.times, amount = consolidatedRecord.amount })
+        end
+    end
+    return recordsInBuffer, recordsCreated
+end
+
+local function flushBuffers()
+   local total, created = flushBuffer(consumptionBuffer, function(item, recipe) return global.results[item].consumed[recipe] end)
+   logger.log(string.format("Flushed consumption buffer of %d items, creating %d records", total, created))
+   total, created = flushBuffer(productionBuffer, function(item, recipe) return global.results[item].produced[recipe] end)
+   logger.log(string.format("Flushed production buffer of %d items, creating %d records", total, created))
+   productionBuffer = {}
+   consumptionBuffer = {}
 end
 
 local function cleanupOldResults(timeInSeconds)
@@ -104,4 +140,5 @@ return {
     getAggregateProduction = getAggregateProduction,
     getOrderedItemList = getOrderedItemList,
     cleanupOldResults = cleanupOldResults,
+    flushBuffers = flushBuffers
 }

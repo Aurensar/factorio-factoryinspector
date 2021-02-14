@@ -75,7 +75,7 @@ local function updateProductionAndConsumptionStatsMD()
                 results.addConsumptionData(consumer.item, consumer.recipe, 1, consumer.amount)
             end
         end
-        data.previous_progress = data.entity.mining_progress
+        if data.entity.valid then data.previous_progress = data.entity.mining_progress end
     end
 
     current_md_partition = current_md_partition + 1
