@@ -67,10 +67,41 @@ local function addProductionData(item, recipe, times, amount)
     table.insert(global.results[item].produced.total, { tick = game.tick, times = times, amount = amount })
 end
 
+local function cleanupOldResults(timeInSeconds)
+    if not timeInSeconds then timeInSeconds = 300 end
+    local cleanupThresholdTick = game.tick - (timeInSeconds * 60) 
+    local recordsCleaned, prodRecords, consRecords = 0, 0, 0
+
+    for item, itemDB in pairs(global.results) do
+        for recipe, recipeDB in pairs(itemDB.produced) do
+            for i, entry in ipairs(recipeDB) do
+                prodRecords = prodRecords + 1
+                if entry.tick < cleanupThresholdTick then 
+                    table.remove(recipeDB, i)
+                    recordsCleaned = recordsCleaned + 1
+                end
+            end
+        end
+        for recipe, recipeDB in pairs(itemDB.consumed) do
+            for i, entry in ipairs(recipeDB) do
+                consRecords = consRecords + 1
+                if entry.tick < cleanupThresholdTick then 
+                    table.remove(recipeDB, i)
+                    recordsCleaned = recordsCleaned + 1
+                end
+            end
+        end
+    end
+
+    logger.log2("Cleaned up "..recordsCleaned.." records")
+    logger.log2(string.format("Database status: %d production records, %d consumption records, %d total records", prodRecords, consRecords, (prodRecords + consRecords)))
+end
+
 return {
     addConsumptionData = addConsumptionData,
     addProductionData = addProductionData,
     getAggregateConsumption = getAggregateConsumption,
     getAggregateProduction = getAggregateProduction,
-    getOrderedItemList = getOrderedItemList
+    getOrderedItemList = getOrderedItemList,
+    cleanupOldResults = cleanupOldResults,
 }

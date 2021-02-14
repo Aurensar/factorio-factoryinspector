@@ -1,6 +1,7 @@
 local logger = require "script.logger"
 local entity_tracker = require "script.entity-tracker"
 local production_tracker = require "script.production-tracker"
+local results = require "script.results"
 
 local function onBuiltEntity(event)
     logger.log("Entity created"..event.created_entity.unit_number)
@@ -46,6 +47,11 @@ local function onGameTick(event)
             end
         end
     end
+
+    if game.tick % 3600 == 0 then
+        logger.log2("Cleanup time")
+        results.cleanupOldResults()
+    end
 end
 
 local function onGuiClick(event)
@@ -70,6 +76,9 @@ local function onGuiTextChanged(event)
     itemList.refresh(player)
 end
 
+local function onGuiOpened(event)
+end
+
 local function onLuaShortcut(event)
     if event.prototype_name == "fi_open_interface" then
         local player = game.get_player(event.player_index)
@@ -83,5 +92,6 @@ return {
     onRemovedEntity = onRemovedEntity,
     onGuiClick = onGuiClick,
     onGuiTextChanged = onGuiTextChanged,
-    onLuaShortcut = onLuaShortcut
+    onLuaShortcut = onLuaShortcut,
+    onGuiOpened = onGuiOpened
   }  
