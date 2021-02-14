@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.10
-Date: ????
+Date: 2021-02-14
   Changes:
     - Now cleans up the results database every minute
     - Potential performance problem with this approach.
