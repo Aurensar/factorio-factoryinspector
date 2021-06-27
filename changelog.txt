@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.3
-Date: ????
+Date: 2021-06-27
   Changes:
     - Check all surfaces periodically for newly added entities not picked up by event handling (when mods add entities via script)
     - Improved data layout and readability in tables
