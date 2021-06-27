@@ -40,13 +40,17 @@ local function enrolConsumedSolidFuel(entity, recipe)
     
         local recipeName, time_in_seconds
         if recipe then
-          time_in_seconds = recipe.energy -- multiplied by building speed?
-          recipeName = recipe.name.." solid fuel"
-          addFakeRecipeLookup(recipeName, recipe.name, "recipe", "recipe-display.solid-fuel")
+            time_in_seconds = recipe.energy -- multiplied by building speed?
+            recipeName = recipe.name.." solid fuel"
+            addFakeRecipeLookup(recipeName, recipe.name, "recipe", "recipe-display.solid-fuel")
+        elseif entity.type == "mining-drill" then
+            if not entity.mining_target then return end
+            time_in_seconds = entity.mining_target.prototype.mineable_properties.mining_time / entity.prototype.mining_speed
+            recipeName = "Mine "..entity.mining_target.prototype.name.. "solid fuel"
+            addFakeRecipeLookup(recipeName, entity.mining_target.prototype.name, "resource", "recipe-display.mining-solid-fuel")
         else
-          time_in_seconds = entity.mining_target.prototype.mineable_properties.mining_time / entity.prototype.mining_speed
-          recipeName = "Mine "..entity.mining_target.prototype.name.. "solid fuel"
-          addFakeRecipeLookup(recipeName, entity.mining_target.prototype.name, "resource", "recipe-display.mining-solid-fuel")
+            -- no recipe, and not a miner - not something we want to track
+            return
         end
     
         local per_craft = entity_power_use / item_power_value * time_in_seconds

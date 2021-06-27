@@ -1,7 +1,7 @@
 local function getRecipe(entity)
     if entity.type == "mining-drill" then return nil end
     local recipe = entity.get_recipe() 
-    if not recipe and entity.burner then 
+    if entity.type == "furnace" and entity.previous_recipe then 
         recipe = entity.previous_recipe
     end
     return recipe
@@ -22,3 +22,5 @@ return {
     getRecipe = getRecipe,
     getRecipeName = getRecipeName
 }
+
+

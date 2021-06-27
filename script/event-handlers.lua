@@ -4,7 +4,7 @@ local production_tracker = require "script.production-tracker"
 local results = require "script.results"
 
 local function onBuiltEntity(event)
-    logger.log("Entity created"..event.created_entity.unit_number)
+    logger.log2("Entity created: "..event.created_entity.unit_number)
     entity_tracker.enrolNewEntity(event.created_entity)
 end
 
@@ -16,7 +16,7 @@ local function onGameTick(event)
     --[[
         This mod is computationally intensive. Every tick, it needs to:
         - check if any entity has changed recipe (due to lack of an on recipe changed event)
-        - check if any entity has produced something, and update internal recordkeeping
+        - check if any entity has produced something, and update internal records.
 
         Updating 1000+ assembling machines per tick is not feasible, so the approach taken is to update a batch of
         X entities per tick to spread the processing load.
@@ -73,6 +73,24 @@ end
 
 local function onGuiTextChanged(event)
     if not string.find(event.element.name, "fi_textbox_search_items") then return end
+
+    if tonumber(event.text) then
+        local number = tonumber(event.text)
+        if not global.entities_partition_lookup[number] then return end
+        local partition = global.entities_partition_lookup[number]
+        local entity = global.entities[partition][number]
+        logger.log2(string.format("DEBUG ENTITY %d Found entity in partition %d",number, partition))
+        logger.log2(string.format("DEBUG ENTITY %d Recipe is %s",number, entity.recipe))
+
+        for i, consumer in ipairs(global.consumers[number]) do
+            logger.log2(string.format("DEBUG ENTITY %d Consumes %d: item=%s amount=%.1f recipe=%s",number, i, consumer.item, consumer.amount, consumer.recipe))
+        end
+        for i, producer in ipairs(global.producers[number]) do
+            logger.log2(string.format("DEBUG ENTITY %d Produces %d: item=%s amount=%.1f recipe=%s",number, i, producer.item, producer.amount, producer.recipe))
+        end
+        return
+    end
+
     local player = game.get_player(event.player_index)
     local ui_state = ui.ui_state(player)
     ui_state.item_filter = event.text

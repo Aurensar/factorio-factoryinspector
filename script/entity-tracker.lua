@@ -7,21 +7,36 @@ local partition_being_checked = 1
 local update_timer = 0
 
 local function removeEntityByNumber(number)
-    global.entities[global.entities_partition_lookup[number]][number] = nil
-    logger.log("Entity removed "..number)
+    logger.log2("Starting to remove entity "..number)
+    local partition = global.entities_partition_lookup[number]
+
+    if not partition then
+        logger.log2("ERROR: Unit "..number.." not found in entity tracker. Please report this error to the mod author.")
+        return
+    end
+
+    logger.log2("Found entity to remove in global partition "..partition)
+    global.entities[partition][number] = nil
 
     if global.entities_am_partition_lookup[number] then
-        global.entities_am[global.entities_am_partition_lookup[number]][number] = nil
+        partition = global.entities_am_partition_lookup[number]
+        logger.log2("Found entity to remove in assembling machine partition "..partition)
+        global.entities_am[partition][number] = nil
     end
     if global.entities_md_partition_lookup[number] then
-        global.entities_md[global.entities_md_partition_lookup[number]][number] = nil
+        partition = global.entities_md_partition_lookup[number]
+        logger.log2("Found entity to remove in mining drill partition "..partition)
+        global.entities_md[partition][number] = nil
     end
     if global.entities_furnace_partition_lookup[number] then
-        global.entities_furnace[global.entities_furnace_partition_lookup[number]][number] = nil
+        partition = global.entities_furnace_partition_lookup[number]
+        logger.log2("Found entity to remove in furnace partition "..partition)
+        global.entities_furnace[partition][number] = nil
     end
 
     global.consumers[number] = {}
     global.producers[number] = {}
+    logger.log2("Entity removed "..number)
 end
 
 local function removeEntity(entity)
@@ -69,13 +84,13 @@ local function checkExistingEntityForChanges(entity, partition)
     local recipeName = recipe_functions.getRecipeName(entity)
     if global.entities[partition][entity.unit_number].recipe == recipeName then return end
 
-    logger.log(string.format("Recipe change for %d %s", entity.unit_number, entity.name))
+    logger.log2(string.format("Recipe change for %d %s", entity.unit_number, entity.name))
     if global.entities[entity.unit_number] then
-        logger.log(string.format("Recipe change: Old recipe %s", global.entities[entity.unit_number].recipe))
+        logger.log2(string.format("Recipe change: Old recipe [%s]", global.entities[entity.unit_number].recipe))
     else
-        logger.log(string.format("Recipe change: Old recipe not set"))
+        logger.log2(string.format("Recipe change: Old recipe not set"))
     end
-    logger.log(string.format("Recipe change: New recipe %s", recipeName))
+    logger.log2(string.format("Recipe change: New recipe [%s]", recipeName))
     updateConsumersAndProducers(entity)
     global.entities[partition][entity.unit_number].recipe = recipeName
 end
