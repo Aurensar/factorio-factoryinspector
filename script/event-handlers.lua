@@ -15,24 +15,32 @@ end
 local function onGameTick(event)
     --[[
         This mod is computationally intensive. Every tick, it needs to:
-        - check if any entity has changed recipe (due to lack of an on recipe changed event)
+        - check if any entity has changed activity, including but not limited to: had its recipe changed, switched to a different fuel, run out of minable resources, etc.
         - check if any entity has produced something, and update internal records.
 
-        Updating 1000+ assembling machines per tick is not feasible, so the approach taken is to update a batch of
+        Updating 1000+ assembling machines per tick is too expensive, so the approach taken is to update a batch of
         X entities per tick to spread the processing load.
         Higher batch size = higher processing load (TODO: Make batch size configurable)
         
-        Global entity collection (governs recipe changes) = low batch size (it doesn't really matter if the mod fails to detect a recipe change for 10-20s)
+        Global entity collection (governs activity changes) = low batch size (it doesn't really matter if the mod fails to detect an activity change for 10-20s)
 
         Assembling machine and furnace results recording (medium batch size) - 
-            AMs have products_finished so it doesn't matter if we "miss" a craft, but if it takes 10s+ to analyse the entire factory, the mod loses accuracy
+            AMs have products_finished so it doesn't matter if we "miss" a craft, but if it takes 10s+ to analyse the entire factory, the mod loses accuracy and becomes less useful.
 
         Mining drills results recording (large batch size)
             Mining drills don't have products_finished so mining drills that cycle very fast will cause the mod to "miss" crafts
             We really need to get through all of the base's mining drills every second (60 ticks)
-            It's likely that even this won't be enough for modded games or games with very fast mining speed 
+            It's likely that even this won't be enough for modded games or games with very fast mining speed. 
+            To be clear: the mod will not accurately track produced or consumed resources from mining drills if the mining cycle time is less than 0.5 seconds.
+
+        To add a final layer of computational expense, the mod also needs to periodically check for new entities being added that did not fire an onBuiltEntity event.
+        This typically happens when other mods create entities via script.
+        Some common mods do not fire https://lua-api.factorio.com/latest/events.html#script_raised_built which would prevent the need for this additional check.
     ]]
     entity_tracker.checkEntityBatchForRecipeChanges()
+    if game.tick % 3600 == 0 then
+        entity_tracker.checkMissingEntities()
+    end
     
     production_tracker.updateProductionAndConsumptionStatsAM()
     production_tracker.updateProductionAndConsumptionStatsFurnace()

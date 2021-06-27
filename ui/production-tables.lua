@@ -9,27 +9,27 @@ function productionTables.create(player)
     ui_state.right_column.add{type="label", caption={"ui.production-stats"}, style="heading_3_label", ignored_by_interaction=true}
 
     local prod_table_frame = ui_state.right_column.add{type="frame", direction="vertical", style="inside_deep_frame"}
-    prod_table_frame.style.height = 300
+    prod_table_frame.style.height = 400
 
     ui_state.prod_table_holder = prod_table_frame.add{type="scroll-pane", direction="vertical"}
     ui_state.prod_table_holder.style.horizontally_stretchable = true
-    ui_state.prod_table_holder.style.height = 300
+    ui_state.prod_table_holder.style.height = 400
     ui_state.prod_table_holder.style.padding = { 10,10 }
 
-    ui_state.prod_table = ui_state.prod_table_holder.add { type = "table", column_count = 6, vertical_centering=false, style="fi_table_production" }
+    ui_state.prod_table = ui_state.prod_table_holder.add { type = "table", column_count = 6, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
     ui_state.prod_table.style.horizontal_spacing = 16
 
     ui_state.right_column.add{type="label", caption={"ui.consumption-stats"}, style="heading_3_label", ignored_by_interaction=true}
 
     local cons_table_frame = ui_state.right_column.add{type="frame", direction="vertical", style="inside_deep_frame"}
-    cons_table_frame.style.height = 300
+    cons_table_frame.style.height = 400
 
     ui_state.cons_table_holder = cons_table_frame.add{type="scroll-pane", direction="vertical"}
     ui_state.cons_table_holder.style.horizontally_stretchable = true
-    ui_state.cons_table_holder.style.height = 300
+    ui_state.cons_table_holder.style.height = 400
     ui_state.cons_table_holder.style.padding = { 10,10 }
 
-    ui_state.cons_table = ui_state.cons_table_holder.add { type = "table", column_count = 6, vertical_centering=false, style="fi_table_production" }
+    ui_state.cons_table = ui_state.cons_table_holder.add { type = "table", column_count = 6, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
     ui_state.cons_table.style.horizontal_spacing = 16
 
     productionTables.refreshConsumption(player)
@@ -64,32 +64,32 @@ function productionTables.refreshConsumption(player)
         return
     end
 
-    table.add { type = "label", caption = {"ui.recipe-name"}, style="bold_label" }
-    table.add { type = "label", caption = {"ui.times-consumed"}, style="bold_label" }
-    table.add { type = "label", caption = {"ui.amount-consumed"}, style="bold_label" }
-    table.add { type = "label", caption = {"ui.per-sec"}, style="bold_label" }
-    table.add { type = "label", caption = {"ui.per-min"}, style="bold_label" }
-    table.add { type = "label", caption = {"ui.percent"}, style="bold_label" }
+    table.add { type = "label", caption = {"ui.recipe-name"}, style="fi_table_text_heading" }
+    table.add { type = "label", caption = {"ui.times-consumed"}, style="fi_table_number_heading" }
+    table.add { type = "label", caption = {"ui.amount-consumed"}, style="fi_table_number_heading" }
+    table.add { type = "label", caption = {"ui.per-sec"}, style="fi_table_number_heading" }
+    table.add { type = "label", caption = {"ui.per-min"}, style="fi_table_number_heading" }
+    table.add { type = "label", caption = {"ui.percent"}, style="fi_table_number_heading" }
 
     local results = results.getAggregateConsumption(selected_item, 120)
     if not results or not results.total then return end
 
-    table.add { type = "label", caption = {"ui.total"}, style="bold_label" }
-    table.add { type = "label", caption = string.format("%d", results.total.times), style="bold_label" }
-    table.add { type = "label", caption = string.format("%d", results.total.amount), style="bold_label"}
-    table.add { type = "label", caption = string.format("%d", results.total.per_sec), style="bold_label" }
-    table.add { type = "label", caption = string.format("%d", results.total.per_min), style="bold_label" }
-    table.add { type = "label", caption = string.format("%d", 100), style="bold_label" }
+    table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
+    table.add { type = "label", caption = string.format("%d", results.total.times), style="fi_table_number_heading" }
+    table.add { type = "label", caption = string.format("%d", results.total.amount), style="fi_table_number_heading"}
+    table.add { type = "label", caption = string.format("%.1f", results.total.per_sec), style="fi_table_number_heading" }
+    table.add { type = "label", caption = string.format("%d", results.total.per_min), style="fi_table_number_heading" }
+    table.add { type = "label", caption = string.format("%d", 100), style="fi_table_number_heading" }
 
     for recipe, data in pairs(results) do
         if recipe ~= "total" and data.times > 0 then
             local name = getDisplayNameForFakeRecipe(recipe)
-            table.add { type = "label", caption = name }
-            table.add { type = "label", caption = string.format("%d", data.times) }
-            table.add { type = "label", caption = string.format("%d", data.amount) }
-            table.add { type = "label", caption = string.format("%d", data.per_sec) }
-            table.add { type = "label", caption = string.format("%d", data.per_min) }
-            table.add { type = "label", caption = string.format("%d", (data.amount / results.total.amount * 100)) }
+            table.add { type = "label", caption = name, style="fi_table_text" }
+            table.add { type = "label", caption = string.format("%d", data.times), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", data.amount), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%.1f", data.per_sec), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", data.per_min), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", (data.amount / results.total.amount * 100)), style="fi_table_number" }
         end
     end
 end
@@ -104,32 +104,32 @@ function productionTables.refreshProduction(player)
         return
     end
 
-    table.add { type = "label", caption = {"ui.recipe-name"}, style="bold_label" }
-    table.add { type = "label", caption = {"ui.times-produced"}, style="bold_label" }
-    table.add { type = "label", caption = {"ui.amount-produced"}, style="bold_label" }
-    table.add { type = "label", caption = {"ui.per-sec"}, style="bold_label" }
-    table.add { type = "label", caption = {"ui.per-min"}, style="bold_label" }
-    table.add { type = "label", caption = {"ui.percent"}, style="bold_label" }
+    table.add { type = "label", caption = {"ui.recipe-name"}, style="fi_table_text_heading" }
+    table.add { type = "label", caption = {"ui.times-produced"}, style="fi_table_number_heading" }
+    table.add { type = "label", caption = {"ui.amount-produced"}, style="fi_table_number_heading" }
+    table.add { type = "label", caption = {"ui.per-sec"}, style="fi_table_number_heading" }
+    table.add { type = "label", caption = {"ui.per-min"}, style="fi_table_number_heading" }
+    table.add { type = "label", caption = {"ui.percent"}, style="fi_table_number_heading" }
 
     local results = results.getAggregateProduction(selected_item, 120)
     if not results or not results.total then return end
 
-    table.add { type = "label", caption = {"ui.total"}, style="bold_label" }
-    table.add { type = "label", caption = string.format("%d", results.total.times), style="bold_label" }
-    table.add { type = "label", caption = string.format("%d", results.total.amount), style="bold_label"}
-    table.add { type = "label", caption = string.format("%d", results.total.per_sec), style="bold_label" }
-    table.add { type = "label", caption = string.format("%d", results.total.per_min), style="bold_label" }
-    table.add { type = "label", caption = string.format("%d", 100), style="bold_label" }
+    table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
+    table.add { type = "label", caption = string.format("%d", results.total.times), style="fi_table_number_heading" }
+    table.add { type = "label", caption = string.format("%d", results.total.amount), style="fi_table_number_heading"}
+    table.add { type = "label", caption = string.format("%.1f", results.total.per_sec), style="fi_table_number_heading" }
+    table.add { type = "label", caption = string.format("%d", results.total.per_min), style="fi_table_number_heading" }
+    table.add { type = "label", caption = string.format("%d", 100), style="fi_table_number_heading" }
 
     for recipe, data in pairs(results) do
         if recipe ~= "total" and data.times > 0 then
             local name = getDisplayNameForFakeRecipe(recipe)
-            table.add { type = "label", caption = name }
-            table.add { type = "label", caption = string.format("%d", data.times) }
-            table.add { type = "label", caption = string.format("%d", data.amount) }
-            table.add { type = "label", caption = string.format("%d", data.per_sec) }
-            table.add { type = "label", caption = string.format("%d", data.per_min) }
-            table.add { type = "label", caption = string.format("%d", (data.amount / results.total.amount * 100)) }
+            table.add { type = "label", caption = name, style="fi_table_text" }
+            table.add { type = "label", caption = string.format("%d", data.times), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", data.amount), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%.1f", data.per_sec), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", data.per_min), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", (data.amount / results.total.amount * 100)), style="fi_table_number" }
         end
     end
 end

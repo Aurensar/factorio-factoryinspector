@@ -4,7 +4,6 @@ require "ui.main"
 
 script.on_init(init.onInit)
 script.on_configuration_changed(init.onConfigChanged)
-
 script.on_event(defines.events.on_tick, event_handlers.onGameTick)
 
 script.on_event(defines.events.on_built_entity, event_handlers.onBuiltEntity,

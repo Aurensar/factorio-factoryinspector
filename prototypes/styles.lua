@@ -177,7 +177,6 @@ styles["fi_button_fake_listbox_item"] = {
     horizontally_squashable = "on"
 }
 
--- The active style needs to be separate so the selected subfactory can still be clicked
 styles["fi_button_fake_listbox_item_active"] = {
     type = "button_style",
     parent = "fi_button_fake_listbox_item",
@@ -186,4 +185,33 @@ styles["fi_button_fake_listbox_item_active"] = {
     clicked_graphical_set = styles.button.selected_clicked_graphical_set,
     default_font_color = styles.button.selected_font_color,
     default_vertical_offset = styles.button.selected_vertical_offset
+}
+
+-- Production and consumption table styles
+styles["fi_table_text_heading"] = {
+    type = "label_style",
+    font = "default-bold",
+    width = 300,
+    maximal_width = 300
+}
+
+styles["fi_table_number_heading"] = {
+    type = "label_style",
+    font = "default-bold",
+    width = 100,
+    maximal_width = 100,
+    horizontal_align = "center"
+}
+
+styles["fi_table_text"] = {
+    type = "label_style",
+    width = 300,
+    maximal_width = 300
+}
+
+styles["fi_table_number"] = {
+    type = "label_style",
+    width = 100,
+    maximal_width = 100,
+    horizontal_align = "center"
 }

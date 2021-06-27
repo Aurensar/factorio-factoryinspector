@@ -139,8 +139,23 @@ local function checkEntityBatchForRecipeChanges()
     end
 end
 
+local function checkMissingEntities()
+    logger.log2(string.format("Checking all surfaces for missing entities"))
+    for _, surface in pairs(game.surfaces) do
+        local entities =  surface.find_entities_filtered({type = {"furnace", "assembling-machine", "mining-drill"}})
+        for i, entity in ipairs(entities) do
+            local partition = global.entities_partition_lookup[entity.unit_number]
+            if not partition then
+                logger.log2(string.format(string.format("Entity %d %s added to database. This entity may have been created by a mod script.", entity.unit_number, entity.name)))
+                enrolNewEntity(entity)
+            end
+        end
+    end
+end
+
 return {
     checkEntityBatchForRecipeChanges = checkEntityBatchForRecipeChanges,
     enrolNewEntity = enrolNewEntity,
-    removeEntity = removeEntity
+    removeEntity = removeEntity,
+    checkMissingEntities = checkMissingEntities
 }
