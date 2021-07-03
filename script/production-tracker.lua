@@ -23,7 +23,7 @@ end
 
 local function updateProductionAndConsumptionStatsAM()
     for unit_number, data in pairs(global.entities_am[current_am_partition]) do
-        if data.previous_count and data.entity.products_finished and data.entity.products_finished > data.previous_count then
+        if data.entity.valid and data.previous_count and data.entity.products_finished and data.entity.products_finished > data.previous_count then
             local diff = data.entity.products_finished - data.previous_count
             for i, producer in ipairs(global.producers[unit_number]) do
                 results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount)
@@ -45,7 +45,7 @@ end
 
 local function updateProductionAndConsumptionStatsFurnace()
     for unit_number, data in pairs(global.entities_furnace[current_furnace_partition]) do
-        if data.previous_count and data.entity.products_finished and data.entity.products_finished > data.previous_count then
+        if data.entity.valid and data.previous_count and data.entity.products_finished and data.entity.products_finished > data.previous_count then
             local diff = data.entity.products_finished - data.previous_count
             for i, producer in ipairs(global.producers[unit_number]) do
                 results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount)
@@ -60,14 +60,13 @@ local function updateProductionAndConsumptionStatsFurnace()
     current_furnace_partition = current_furnace_partition + 1
     if current_furnace_partition > global.furnace_partition_data.current then
         current_furnace_partition = 1
-        --logger.log(string.format("Finished updating %d furnace partitions in %d ticks", global.furnace_partition_data.current, (game.tick - furnace_start_tick)))
         furnace_start_tick = game.tick
     end
 end
 
 local function updateProductionAndConsumptionStatsMD()
     for unit_number, data in pairs(global.entities_md[current_md_partition]) do
-        if data.previous_progress and data.entity.mining_progress and data.entity.mining_progress < data.previous_progress then
+        if data.entity.valid and data.previous_progress and data.entity.mining_progress and data.entity.mining_progress < data.previous_progress then
             for i, producer in ipairs(global.producers[unit_number]) do
                 results.addProductionData(producer.item, producer.recipe, 1, producer.amount)
             end

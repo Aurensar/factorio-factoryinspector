@@ -12,6 +12,14 @@ local function log2(string)
     --game.print("[FI] "..string)
 end
 
+local function error(string)
+    if __DebugAdapter then
+        __DebugAdapter.print("[FI Error] "..string)
+    end
+    game.print("[FI Error] "..string)
+end
+
+
 
 return {
     log = log,

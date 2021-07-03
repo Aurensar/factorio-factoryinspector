@@ -10,7 +10,6 @@ local function createHeader(player)
     local titleBar = ui_state.mainFrame.add{type="flow", name="fi_flow_main_titlebar", direction="horizontal"}
     titleBar.style.horizontal_spacing = 8
     titleBar.drag_target = ui_state.mainFrame
-    -- the separator line causes the height to increase for some inexplicable reason, so we must hardcode it here
     titleBar.style.height = 30
 
     titleBar.add{type="label", caption={"mod-name.fi"}, style="frame_title",

@@ -2,6 +2,9 @@
 Version: 1.1.5
 Date: ????
   Changes:
+    - More table styling fixes
+    - Potential fix to a crash bug around entity validity
+    - Error messages always print text in game
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.4
 Date: 2021-06-28

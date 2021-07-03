@@ -198,8 +198,8 @@ styles["fi_table_text_heading"] = {
 styles["fi_table_number_heading"] = {
     type = "label_style",
     font = "default-bold",
-    width = 100,
-    maximal_width = 100,
+    width = 120,
+    maximal_width = 120,
     horizontal_align = "center"
 }
 
@@ -211,7 +211,7 @@ styles["fi_table_text"] = {
 
 styles["fi_table_number"] = {
     type = "label_style",
-    width = 100,
-    maximal_width = 100,
+    width = 120,
+    maximal_width = 120,
     horizontal_align = "center"
 }

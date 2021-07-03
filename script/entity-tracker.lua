@@ -11,7 +11,7 @@ local function removeEntityByNumber(number)
     local partition = global.entities_partition_lookup[number]
 
     if not partition then
-        logger.log2("ERROR: Unit "..number.." not found in entity tracker. Please report this error to the mod author.")
+        logger.error("Unit "..number.." not found in entity tracker. Please report this error to the mod author.")
         return
     end
 
