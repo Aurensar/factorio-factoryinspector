@@ -94,6 +94,11 @@ local function enrolProducedMiningOutputs(entity, recipe)
         local per_craft = 1
 
         for i, product in ipairs(entity.mining_target.prototype.mineable_properties.products) do
+
+            if not product.amount then
+                product.amount = product.amount_min + ((product.amount_max - product.amount_min) / 2)
+            end
+
             local recipeName="mine-"..entity.mining_target.prototype.name
             table.insert(global.producers[entity.unit_number], {entity=entity, item=product.name, amount=product.amount * product.probability, recipe=recipeName})
             initResults(product.name, recipeName)

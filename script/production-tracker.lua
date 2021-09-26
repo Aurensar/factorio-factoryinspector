@@ -80,7 +80,6 @@ local function updateProductionAndConsumptionStatsMD()
     current_md_partition = current_md_partition + 1
     if current_md_partition > global.md_partition_data.current then
         current_md_partition = 1
-        --logger.log(string.format("Finished updating %d mining drill partitions in %d ticks", global.md_partition_data.current, (game.tick - md_start_tick)))
         md_start_tick = game.tick
     end
 end
