@@ -2,6 +2,7 @@
 Version: 1.1.11
 Date: ????
   Changes:
+    - Fixed a crash bug related to mining a building that had been created by certain other mods
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.10
 Date: 2022-10-15
