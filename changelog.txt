@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.13
-Date: ????
+Date: 2022-10-16
   Changes:
     - Cleaned up the default logging to be less verbose, enabled verbose logging in a couple of specific scenarios to catch crash bugs
     - Added entity diagnostic by typing a unit number into the UI filter text box
