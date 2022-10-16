@@ -32,7 +32,12 @@ local function updateProductionAndConsumptionStatsAM()
                 results.addConsumptionData(consumer.item, consumer.recipe, diff, diff*consumer.amount)
             end
         end
-        data.previous_count = data.entity.products_finished
+
+        if not data.entity.valid then
+            logger.error(string.format("Assembling machine (unit number %d) has become invalid. Please report this error to the mod author", unit_number))
+        else
+            data.previous_count = data.entity.products_finished
+        end
     end
 
     current_am_partition = current_am_partition + 1

@@ -2,6 +2,7 @@
 Version: 1.1.12
 Date: ????
   Changes:
+    - Fixed another crash, this one seemingly related to other mods silently swapping out buildings to enable various functionality
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.11
 Date: 2022-10-15
