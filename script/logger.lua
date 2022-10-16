@@ -2,15 +2,15 @@
 local function log(string)
     if __DebugAdapter then
         __DebugAdapter.print("[FI] "..string)
+        game.print("[FI] "..string)
     end
 end
 
 local function log2(string)
     if __DebugAdapter then
         __DebugAdapter.print("[FI] "..string)
-        game.print("[FI] "..string)
     end
-    --game.print("[FI] "..string)
+    game.print("[FI] "..string)
 end
 
 local function error(string)

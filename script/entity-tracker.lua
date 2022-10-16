@@ -7,7 +7,7 @@ local partition_being_checked = 1
 local update_timer = 0
 
 local function removeEntityByNumber(number)
-    logger.log2("Starting to remove entity "..number)
+    logger.log("Starting to remove entity "..number)
     local partition = global.entities_partition_lookup[number]
 
     if not partition then
@@ -15,28 +15,28 @@ local function removeEntityByNumber(number)
         return
     end
 
-    logger.log2("Found entity to remove in global partition "..partition)
+    logger.log("Found entity to remove in global partition "..partition)
     global.entities[partition][number] = nil
 
     if global.entities_am_partition_lookup[number] then
         partition = global.entities_am_partition_lookup[number]
-        logger.log2("Found entity to remove in assembling machine partition "..partition)
+        logger.log("Found entity to remove in assembling machine partition "..partition)
         global.entities_am[partition][number] = nil
     end
     if global.entities_md_partition_lookup[number] then
         partition = global.entities_md_partition_lookup[number]
-        logger.log2("Found entity to remove in mining drill partition "..partition)
+        logger.log("Found entity to remove in mining drill partition "..partition)
         global.entities_md[partition][number] = nil
     end
     if global.entities_furnace_partition_lookup[number] then
         partition = global.entities_furnace_partition_lookup[number]
-        logger.log2("Found entity to remove in furnace partition "..partition)
+        logger.log("Found entity to remove in furnace partition "..partition)
         global.entities_furnace[partition][number] = nil
     end
 
     global.consumers[number] = {}
     global.producers[number] = {}
-    logger.log2("Entity removed "..number)
+    logger.log("Entity removed "..number)
 end
 
 local function removeEntity(entity)
@@ -84,13 +84,13 @@ local function checkExistingEntityForChanges(entity, partition)
     local recipeName = recipe_functions.getRecipeName(entity)
     if global.entities[partition][entity.unit_number].recipe == recipeName then return end
 
-    logger.log2(string.format("Recipe change for %d %s", entity.unit_number, entity.name))
+    logger.log(string.format("Recipe change for %d %s", entity.unit_number, entity.name))
     if global.entities[entity.unit_number] then
-        logger.log2(string.format("Recipe change: Old recipe [%s]", global.entities[entity.unit_number].recipe))
+        logger.log(string.format("Recipe change: Old recipe [%s]", global.entities[entity.unit_number].recipe))
     else
-        logger.log2(string.format("Recipe change: Old recipe not set"))
+        logger.log(string.format("Recipe change: Old recipe not set"))
     end
-    logger.log2(string.format("Recipe change: New recipe [%s]", recipeName))
+    logger.log(string.format("Recipe change: New recipe [%s]", recipeName))
     updateConsumersAndProducers(entity)
     global.entities[partition][entity.unit_number].recipe = recipeName
 end
@@ -140,13 +140,13 @@ local function checkEntityBatchForRecipeChanges()
 end
 
 local function checkMissingEntities()
-    logger.log2(string.format("Checking all surfaces for missing entities"))
+    logger.log(string.format("Checking all surfaces for missing entities"))
     for _, surface in pairs(game.surfaces) do
         local entities =  surface.find_entities_filtered({type = {"furnace", "assembling-machine", "mining-drill"}})
         for i, entity in ipairs(entities) do
             local partition = global.entities_partition_lookup[entity.unit_number]
             if not partition then
-                logger.log2(string.format(string.format("Entity %d %s added to database. This entity may have been created by a mod script.", entity.unit_number, entity.name)))
+                logger.log(string.format(string.format("Entity %d %s added to database. This entity may have been created by a mod script.", entity.unit_number, entity.name)))
                 enrolNewEntity(entity)
             end
         end

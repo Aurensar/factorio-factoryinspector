@@ -129,8 +129,8 @@ local function cleanupOldResults(timeInSeconds)
         end
     end
 
-    logger.log2("Cleaned up "..recordsCleaned.." records")
-    logger.log2(string.format("Database status: %d production records, %d consumption records, %d total records", prodRecords, consRecords, (prodRecords + consRecords)))
+    logger.log("Cleaned up "..recordsCleaned.." records")
+    logger.log(string.format("Database status: %d production records, %d consumption records, %d total records", prodRecords, consRecords, (prodRecords + consRecords)))
 end
 
 return {

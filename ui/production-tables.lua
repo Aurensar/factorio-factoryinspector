@@ -43,7 +43,7 @@ end
 
 local function getDisplayNameForFakeRecipe(fakeRecipe)
     if not global.fakeRecipeLookup[fakeRecipe] then
-        logger.log2("Lookup system can't find a match for fake recipe "..fakeRecipe..", please report a bug")
+        logger.error("Lookup system can't find a match for fake recipe "..fakeRecipe..", please report a bug")
         return "No lookup"
     end
 
