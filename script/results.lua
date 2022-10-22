@@ -52,6 +52,7 @@ local function getOrderedItemList()
     for item, _ in pairs(global.results) do
         table.insert(resultsToReturn, item)
     end
+    table.sort(resultsToReturn)
     return resultsToReturn
 end
 
