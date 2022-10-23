@@ -2,6 +2,8 @@
 Version: 1.1.14
 Date: ????
   Changes:
+    - Fix for table sizes on resolutions below 4K (thanks Jon)
+    - Left-hand table of products being built is now sorted (thanks Jon)
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.13
 Date: 2022-10-16
