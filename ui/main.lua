@@ -33,8 +33,8 @@ local function createHeader(player)
     button_close.style.padding = 2
 end
 
-function fiMainFrame.create(player)
-    local gui = player.gui.screen.add{type="frame", name="fi_frame_main_dialog", visible=true, direction="vertical"}
+function fiMainFrame.create(player, visible)
+    local gui = player.gui.screen.add{type="frame", name="fi_frame_main_dialog", visible=visible, direction="vertical"}
     local ui_state = ui.ui_state(player)
 
     local resolution, scale = player.display_resolution, player.display_scale
@@ -66,6 +66,8 @@ function fiMainFrame.create(player)
 
     itemList.create(player)
     productionTables.create(player)
+
+    if visible then player.opened = gui end
 end
 
 function fiMainFrame.refresh(player, context_to_refresh)
@@ -73,10 +75,14 @@ end
 
 function fiMainFrame.toggle(player)
     local ui_state = ui.ui_state(player)
-    if not ui_state.mainFrame then
-        fiMainFrame.create(player)
+    local mainFrame = ui_state.mainFrame
+
+    if not mainFrame then
+        fiMainFrame.create(player, true)
         return
     end
-
-    ui_state.mainFrame.visible = not ui_state.mainFrame.visible
+    
+    local v = not mainFrame.visible
+    mainFrame.visible = v
+    player.opened = (v) and mainFrame or nil
 end
