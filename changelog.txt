@@ -2,6 +2,7 @@
 Version: 1.1.16
 Date: ????
   Changes:
+    - Pressing the game menu key (Esc by default) now closes the main FI window (for real this time)
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.15
 Date: 2022-10-23
