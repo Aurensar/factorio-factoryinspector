@@ -2,6 +2,7 @@
 Version: 1.1.17
 Date: ????
   Changes:
+    - Bug fixes associated with the previous version.
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.16
 Date: 2022-10-23
