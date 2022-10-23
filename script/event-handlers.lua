@@ -114,7 +114,7 @@ local function onLuaShortcut(event)
 end
 
 local function onGuiClosed(event)
-    if string.find(event.element.name, "fi_frame_main_dialog") then 
+    if event.element and string.find(event.element.name, "fi_frame_main_dialog") then 
         local player = game.get_player(event.player_index)
         fiMainFrame.close(player)
     end
