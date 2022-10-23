@@ -112,11 +112,19 @@ local function onLuaShortcut(event)
     end
 end
 
+local function onGuiClosed(event)
+    if string.find(event.element.name, "fi_frame_main_dialog") then 
+        local player = game.get_player(event.player_index)
+        fiMainFrame.toggle(player)
+    end
+end
+
 return {
     onGameTick = onGameTick,
     onBuiltEntity = onBuiltEntity,
     onRemovedEntity = onRemovedEntity,
     onGuiClick = onGuiClick,
     onGuiTextChanged = onGuiTextChanged,
-    onLuaShortcut = onLuaShortcut
-  }  
+    onLuaShortcut = onLuaShortcut,
+    onGuiClosed = onGuiClosed
+}  
