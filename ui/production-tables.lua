@@ -9,11 +9,11 @@ function productionTables.create(player)
     ui_state.right_column.add{type="label", caption={"ui.production-stats"}, style="heading_3_label", ignored_by_interaction=true}
 
     local prod_table_frame = ui_state.right_column.add{type="frame", direction="vertical", style="inside_deep_frame"}
-    prod_table_frame.style.height = 400
+    prod_table_frame.style.vertically_stretchable = true
 
     ui_state.prod_table_holder = prod_table_frame.add{type="scroll-pane", direction="vertical"}
     ui_state.prod_table_holder.style.horizontally_stretchable = true
-    ui_state.prod_table_holder.style.height = 400
+    ui_state.prod_table_holder.style.vertically_stretchable = true    
     ui_state.prod_table_holder.style.padding = { 10,10 }
 
     ui_state.prod_table = ui_state.prod_table_holder.add { type = "table", column_count = 6, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
@@ -22,11 +22,11 @@ function productionTables.create(player)
     ui_state.right_column.add{type="label", caption={"ui.consumption-stats"}, style="heading_3_label", ignored_by_interaction=true}
 
     local cons_table_frame = ui_state.right_column.add{type="frame", direction="vertical", style="inside_deep_frame"}
-    cons_table_frame.style.height = 400
+    cons_table_frame.style.vertically_stretchable = true
 
     ui_state.cons_table_holder = cons_table_frame.add{type="scroll-pane", direction="vertical"}
     ui_state.cons_table_holder.style.horizontally_stretchable = true
-    ui_state.cons_table_holder.style.height = 400
+    ui_state.cons_table_holder.style.vertically_stretchable = true
     ui_state.cons_table_holder.style.padding = { 10,10 }
 
     ui_state.cons_table = ui_state.cons_table_holder.add { type = "table", column_count = 6, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
