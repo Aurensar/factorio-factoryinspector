@@ -68,7 +68,8 @@ end
 local function onGuiClick(event)
     if string.find(event.element.name, "fi_title_bar_close_interface") then
         local player = game.get_player(event.player_index)
-        fiMainFrame.toggle(player)
+        fiMainFrame.close(player)
+        return        
     end
     if not string.find(event.element.name, "fi_item_button_") then return end
     local player = game.get_player(event.player_index)
@@ -115,7 +116,7 @@ end
 local function onGuiClosed(event)
     if string.find(event.element.name, "fi_frame_main_dialog") then 
         local player = game.get_player(event.player_index)
-        fiMainFrame.toggle(player)
+        fiMainFrame.close(player)
     end
 end
 

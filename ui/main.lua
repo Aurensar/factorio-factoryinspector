@@ -86,3 +86,13 @@ function fiMainFrame.toggle(player)
     mainFrame.visible = v
     player.opened = (v) and mainFrame or nil
 end
+
+function fiMainFrame.close(player)
+    local ui_state = ui.ui_state(player)
+    local mainFrame = ui_state.mainFrame
+
+    if mainFrame then
+        mainFrame.visible = false
+        if player.opened == mainFrame then player.opened = nil end
+    end
+end
