@@ -49,10 +49,12 @@ local function updateConsumersAndProducers(entity)
 
     local recipe = recipe_functions.getRecipe(entity)
     -- consumption
-    if recipe then input_output_calculator.enrolConsumedRecipeIngredients(entity, recipe) end
+    if recipe then 
+        input_output_calculator.enrolConsumedRecipeIngredients(entity, recipe) 
+        input_output_calculator.enrolConsumedSolidFuel(entity, recipe)
+        input_output_calculator.enrolConsumedFluidFuel(entity, recipe)
+        end
     if entity.type == "mining-drill" then input_output_calculator.enrolConsumedMiningFluid(entity) end
-    input_output_calculator.enrolConsumedSolidFuel(entity, recipe)
-    input_output_calculator.enrolConsumedFluidFuel(entity, recipe)
 
     -- production
     if entity.type == "mining-drill" then input_output_calculator.enrolProducedMiningOutputs(entity) end
