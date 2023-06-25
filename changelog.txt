@@ -1,6 +1,11 @@
 ---------------------------------------------------------------------------------------------------
-Version: 1.1.18
+Version: 1.1.19
 Date: ????
+  Changes:
+    - Integrated potential fix for crash on entity registration (Thanks to user timspeedle for this fix!)
+---------------------------------------------------------------------------------------------------
+Version: 1.1.18
+Date: 2023-06-25
   Changes:
     - Revalidating toolchain on new machine
 ---------------------------------------------------------------------------------------------------
