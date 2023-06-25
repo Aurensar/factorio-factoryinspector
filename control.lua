@@ -19,7 +19,6 @@ script.on_event(defines.events.script_raised_built, event_handlers.onBuiltEntity
     {filter="type", type = "assembling-machine"}, 
     {filter="type", type = "furnace"}})
 
-
 script.on_event(defines.events.on_player_mined_entity, event_handlers.onRemovedEntity,
   {{filter="type", type = "mining-drill"},
    {filter="type", type = "assembling-machine"}, 
