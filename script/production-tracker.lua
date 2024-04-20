@@ -59,7 +59,11 @@ local function updateProductionAndConsumptionStatsFurnace()
                 results.addConsumptionData(consumer.item, consumer.recipe, diff, diff*consumer.amount)
             end
         end
-        data.previous_count = data.entity.products_finished
+        if not data.entity.valid then
+            logger.error(string.format("Furnace (unit number %d) has become invalid. Please report this error to the mod author", unit_number))
+        else
+            data.previous_count = data.entity.products_finished
+        end
     end
 
     current_furnace_partition = current_furnace_partition + 1

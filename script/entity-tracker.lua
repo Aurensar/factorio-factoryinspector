@@ -6,38 +6,96 @@ local partition_being_checked = 1
 
 local update_timer = 0
 
+
+-- Bypasses the partition lookup table and scans the whole database for an id. Shouldn't be needed...
+local function deepRemoveEntity(number_to_delete, inner_database)
+    local count, am_count, furnace_count, md_count = 0, 0, 0, 0
+
+    for partition,data in pairs(global.entities) do
+        for unit_number, innerData in pairs(data) do
+            if unit_number == number_to_delete then
+                logger.log("[Deep scan] Found entity to remove in global partition "..partition)
+                count = count + 1
+                global.entities[partition][unit_number] = nil
+            end
+        end
+    end
+
+    for partition,data in pairs(global.entities_am) do
+        for unit_number, innerData in pairs(data) do
+            if unit_number == number_to_delete then
+                logger.log("[Deep scan] Found entity to remove in AM partition "..partition)
+                am_count = am_count + 1
+                global.entities_am[partition][unit_number] = nil
+            end
+        end
+    end
+
+    for partition,data in pairs(global.entities_md) do
+        for unit_number, innerData in pairs(data) do
+            if unit_number == number_to_delete then
+                logger.log("[Deep scan] Found entity to remove in MD partition "..partition)
+                md_count = md_count + 1
+                global.entities_md[partition][unit_number] = nil
+            end
+        end
+    end
+
+    for partition,data in pairs(global.entities_furnace) do
+        for unit_number, innerData in pairs(data) do
+            if unit_number == number_to_delete then
+                logger.log("[Deep scan] Found entity to remove in F partition "..partition)
+                furnace_count = furnace_count + 1
+                global.entities_furnace[partition][unit_number] = nil
+            end
+        end
+    end
+
+    logger.log(string.format("[Deep Remove %d] Occurrences: G=%d AM=%d MD=%d F=%d", number_to_delete, count, am_count, md_count, furnace_count))
+
+    if count > 1 or am_count > 1 or md_count > 1 or furnace_count > 1 then
+        logger.error(string.format("[Deep Remove %d] Occurrences: G=%d AM=%d MD=%d F=%d", number_to_delete, count, am_count, md_count, furnace_count))
+    end
+end
+
 local function removeEntityByNumber(number)
     logger.log("Starting to remove entity "..number)
     local partition = global.entities_partition_lookup[number]
 
     if not partition then
         logger.error("Unit "..number.." not found in entity tracker. Please report this error to the mod author.")
+        deepRemoveEntity(number)
         return
     end
 
     logger.log("Found entity to remove in global partition "..partition)
     global.entities[partition][number] = nil
+    global.entities_partition_lookup[number] = nil
 
     if global.entities_am_partition_lookup[number] then
         partition = global.entities_am_partition_lookup[number]
         logger.log("Found entity to remove in assembling machine partition "..partition)
         global.entities_am[partition][number] = nil
+        global.entities_am_partition_lookup[number] = nil
     end
     if global.entities_md_partition_lookup[number] then
         partition = global.entities_md_partition_lookup[number]
         logger.log("Found entity to remove in mining drill partition "..partition)
         global.entities_md[partition][number] = nil
+        global.entities_md_partition_lookup[number] = nil
     end
     if global.entities_furnace_partition_lookup[number] then
         partition = global.entities_furnace_partition_lookup[number]
         logger.log("Found entity to remove in furnace partition "..partition)
         global.entities_furnace[partition][number] = nil
+        global.entities_furnace_partition_lookup[number] = nil
     end
 
     global.consumers[number] = {}
     global.producers[number] = {}
     logger.log("Entity removed "..number)
 end
+
 
 local function removeEntity(entity)
     removeEntityByNumber(entity.unit_number)
@@ -129,8 +187,11 @@ local function checkEntityBatchForRecipeChanges()
     end
 
     for number, data in pairs(global.entities[partition_being_checked]) do
-        if not data.entity.valid then removeEntityByNumber(number)
-        else checkExistingEntityForChanges(data.entity, partition_being_checked) end
+        if not data.entity.valid then 
+            removeEntityByNumber(number)
+        else 
+            checkExistingEntityForChanges(data.entity, partition_being_checked) 
+        end
     end
 
     partition_being_checked = partition_being_checked + 1

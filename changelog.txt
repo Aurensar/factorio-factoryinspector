@@ -2,6 +2,8 @@
 Version: 1.1.22
 Date: ????
   Changes:
+    - Better handling for furnace type entities going invalid
+    - Brute force removal of entities from internal databases when necessary. Slow, but only runs when entities get deleted which is very rare.
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.21
 Date: 2024-04-20
