@@ -4,8 +4,12 @@ local production_tracker = require "script.production-tracker"
 local results = require "script.results"
 
 local function onBuiltEntity(event)
-    logger.log("Entity created: "..event.created_entity.unit_number)
-    entity_tracker.enrolNewEntity(event.created_entity)
+    local entity = event.created_entity or event.entity
+
+    if entity and entity.valid then
+      logger.log("Entity created: "..entity.unit_number)
+      entity_tracker.enrolNewEntity(entity)
+    end
 end
 
 local function onRemovedEntity(event)
