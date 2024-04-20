@@ -20,12 +20,22 @@ function renderItem(ui_state, item, selected_item)
 
     local selected = (item == selected_item)
     local style = (selected) and "fi_button_fake_listbox_item_active" or "fi_button_fake_listbox_item"
-    local tooltip = {"", item, item}
-    local name
-    if game.item_prototypes[item] then name = game.item_prototypes[item].localised_name else name = game.fluid_prototypes[item].localised_name end
+    local tooltip = item
+    local name, sprite
+    if game.item_prototypes[item] then 
+        name = game.item_prototypes[item].localised_name 
+        sprite = "item/"..item
+    else 
+        name = game.fluid_prototypes[item].localised_name 
+        sprite = "fluid/"..item
+    end
 
-    ui_state.listbox_items.add{type="button", name = string.format("fi_item_button_%s", item), caption = name,
+    local item_button = ui_state.listbox_items.add{type="button", name = string.format("fi_item_button_%s", item),
       tooltip=tooltip, style=style, mouse_button_filter={"left-and-right"}}
+    local item_button_flow = item_button.add{type="flow"}
+
+    item_button_flow.add{type="sprite", sprite=(sprite)}
+    item_button_flow.add{type="label", caption=name}
 end
 
 function itemList.refresh(player)
