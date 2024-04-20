@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.20
-Date: ????
+Date: 2024-04-20
   Changes:
     - Updated onBuiltEntity logic for better compatibility with Bio Industries + other mods.
     - There are still bugs related to entity destruction, but I can't reproduce, still working on it...
