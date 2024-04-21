@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.24
-Date: ????
+Date: 2024-04-21
   Changes:
     - [GUI] Various layout optimisations
     - [GUI] Now shows recipe or resource icons next to each producer and consumer
