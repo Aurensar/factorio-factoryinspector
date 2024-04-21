@@ -10,7 +10,7 @@ function itemList.create(player)
     item_list_holder.style.vertically_stretchable = true
 
     ui_state.listbox_items = item_list_holder.add{type="scroll-pane", style="fi_scroll-pane_fake_listbox"}
-    ui_state.listbox_items.style.width = 200
+    ui_state.listbox_items.style.width = 250
 
     itemList.refresh(player)
 end

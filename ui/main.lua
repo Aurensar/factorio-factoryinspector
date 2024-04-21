@@ -55,11 +55,11 @@ function fiMainFrame.create(player, visible)
 
     local toplevel_left_column = main_horizontal.add{type="flow", direction="vertical"}
     toplevel_left_column.style.vertical_spacing = 10
-    toplevel_left_column.style.width = 200
+    toplevel_left_column.style.width = 250
 
     local toplevel_right_column = main_horizontal.add{type="flow", direction="vertical"}
     toplevel_right_column.style.vertical_spacing = 10
-    toplevel_right_column.style.width = gui.style.maximal_width - 250
+    toplevel_right_column.style.width = gui.style.maximal_width - 300
 
     ui_state.left_column = toplevel_left_column
     ui_state.right_column = toplevel_right_column

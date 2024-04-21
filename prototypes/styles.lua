@@ -188,11 +188,19 @@ styles["fi_button_fake_listbox_item_active"] = {
 }
 
 -- Production and consumption table styles
+
+styles["fi_table_sprite_heading"] = {
+    type = "label_style",
+    font = "default-bold",
+    width = 30,
+    maximal_width = 30
+}
+
 styles["fi_table_text_heading"] = {
     type = "label_style",
     font = "default-bold",
-    width = 300,
-    maximal_width = 300
+    width = 250,
+    maximal_width = 250
 }
 
 styles["fi_table_number_heading"] = {
@@ -205,8 +213,8 @@ styles["fi_table_number_heading"] = {
 
 styles["fi_table_text"] = {
     type = "label_style",
-    width = 300,
-    maximal_width = 300
+    width = 250,
+    maximal_width = 250
 }
 
 styles["fi_table_number"] = {

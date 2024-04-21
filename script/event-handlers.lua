@@ -37,7 +37,7 @@ local function onGameTick(event)
             It's likely that even this won't be enough for modded games or games with very fast mining speed. 
             To be clear: the mod will not accurately track produced or consumed resources from mining drills if the mining cycle time is less than 0.5 seconds.
 
-        To add a final layer of computational expense, the mod also needs to periodically check for new entities being added that did not fire an onBuiltEntity event.
+        To add a final layer of difficulty, the mod also needs to periodically check for new entities being added that did not fire an onBuiltEntity event.
         This typically happens when other mods create entities via script.
         Some common mods do not fire https://lua-api.factorio.com/latest/events.html#script_raised_built which would prevent the need for this additional check.
     ]]
