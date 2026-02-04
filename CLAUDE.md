@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Factory Inspector is a Factorio mod (Lua) that measures per-recipe consumption and production for all items. It tracks assembling machines, furnaces, and mining drills, aggregating statistics over rolling time windows. Targets complex modded games where items have many producers/consumers.
 
-**Factorio version**: 1.1+ | **Dependencies**: base >= 1.1.4, flib >= 0.6.0
+**Factorio version**: 2.0+ | **Dependencies**: base >= 2.0.0, flib >= 0.15.0
 
 ## Development Setup
 
@@ -27,7 +27,7 @@ Factory Inspector is a Factorio mod (Lua) that measures per-recipe consumption a
 
 | Module | Role |
 |---|---|
-| `init.lua` | `on_init`/`on_configuration_changed` — sets up all `global` tables |
+| `init.lua` | `on_init`/`on_configuration_changed` — sets up all `storage` tables |
 | `event-handlers.lua` | All event callbacks; orchestrates tick-based processing |
 | `entity-tracker.lua` | Manages entity collections with partition-based batching |
 | `production-tracker.lua` | Per-tick stat collection (products_finished, mining_progress) |
@@ -50,7 +50,7 @@ Factory Inspector is a Factorio mod (Lua) that measures per-recipe consumption a
 
 1. **Entity registration**: Entity built → `onBuiltEntity()` → `entity-tracker.enrolNewEntity()` → `input-output-calculator` creates consumer/producer records
 2. **Stat collection**: Every tick (partitioned) → `production-tracker` reads entity counters → writes to buffer
-3. **Buffer flush**: Every 300 ticks → `results.flushBuffers()` consolidates buffer into persistent `global.results`
+3. **Buffer flush**: Every 300 ticks → `results.flushBuffers()` consolidates buffer into persistent `storage.results`
 4. **Cleanup**: Every 3600 ticks → removes results older than 5 minutes
 5. **UI display**: Every 60 ticks → `results.getAggregateProduction/Consumption()` over 120-second window → render tables
 
@@ -62,20 +62,20 @@ Entities are distributed across partitions to spread processing load. Each tick 
 - Mining drills: batch 20
 - Furnaces: batch 10
 
-Separate collections exist per entity type (`global.entities`, `global.entities_am`, `global.entities_md`, `global.entities_furnace`) with corresponding partition lookup tables.
+Separate collections exist per entity type (`storage.entities`, `storage.entities_am`, `storage.entities_md`, `storage.entities_furnace`) with corresponding partition lookup tables.
 
-### Global State (`global` table)
+### Persistent State (`storage` table)
 
-All persistent state lives in Factorio's `global` table (survives save/load):
-- `global.players[playerIndex].ui` — per-player UI state
-- `global.entities[partition]` / `global.entities_am[partition]` / etc. — partitioned entity lists
-- `global.consumers[unitNumber]` / `global.producers[unitNumber]` — per-entity tracking records
-- `global.results[item].produced[recipe]` / `.consumed[recipe]` — timestamped stat records
-- `global.fakeRecipeLookup[recipe]` — display metadata for synthetic recipes (mining, fuel consumption)
+All persistent state lives in Factorio's `storage` table (survives save/load):
+- `storage.players[playerIndex].ui` — per-player UI state
+- `storage.entities[partition]` / `storage.entities_am[partition]` / etc. — partitioned entity lists
+- `storage.consumers[unitNumber]` / `storage.producers[unitNumber]` — per-entity tracking records
+- `storage.results[item].produced[recipe]` / `.consumed[recipe]` — timestamped stat records
+- `storage.fakeRecipeLookup[recipe]` — display metadata for synthetic recipes (mining, fuel consumption)
 
 ### Fake Recipes
 
-Mining outputs and fuel consumption don't have real Factorio recipes. The mod creates synthetic recipe names (e.g., "Mine iron-ore") with display info stored in `global.fakeRecipeLookup` so the UI can show them uniformly alongside real recipes.
+Mining outputs and fuel consumption don't have real Factorio recipes. The mod creates synthetic recipe names (e.g., "Mine iron-ore") with display info stored in `storage.fakeRecipeLookup` so the UI can show them uniformly alongside real recipes.
 
 ## Coding Conventions
 

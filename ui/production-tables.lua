@@ -42,20 +42,20 @@ function productionTables.refresh(player)
 end
 
 local function getDisplayNameAndSpriteForDynamicRecipe(dynamicRecipe)
-    if not global.fakeRecipeLookup[dynamicRecipe] then
+    if not storage.fakeRecipeLookup[dynamicRecipe] then
         logger.error("Lookup system can't find a match for dynamic recipe "..dynamicRecipe..", please report a bug")
         return "Unknown", "item/iron-plate"
     end
 
-    local lookup = global.fakeRecipeLookup[dynamicRecipe]
+    local lookup = storage.fakeRecipeLookup[dynamicRecipe]
     local prototypeName
     local sprite = "item/iron-plate"
     if lookup.prototypeType == "recipe" then 
-        prototypeName = game.recipe_prototypes[lookup.prototype].localised_name 
+        prototypeName = prototypes.recipe[lookup.prototype].localised_name 
         sprite = "recipe/"..lookup.prototype
     end
     if lookup.prototypeType == "resource" then 
-        prototypeName = game.entity_prototypes[lookup.prototype].localised_name 
+        prototypeName = prototypes.entity[lookup.prototype].localised_name 
         sprite = "entity/"..lookup.prototype
     end
     return {lookup.formatString, prototypeName}, sprite

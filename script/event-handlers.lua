@@ -4,7 +4,7 @@ local production_tracker = require "script.production-tracker"
 local results = require "script.results"
 
 local function onBuiltEntity(event)
-    local entity = event.created_entity or event.entity
+    local entity = event.entity
 
     if entity and entity.valid then
       logger.log("Entity created: "..entity.unit_number)
@@ -51,7 +51,7 @@ local function onGameTick(event)
     production_tracker.updateProductionAndConsumptionStatsMD()
 
     if game.tick % 60 == 0 then
-        for playerIndex, data in pairs(global.players) do
+        for playerIndex, data in pairs(storage.players) do
             if data.ui and data.ui.mainFrame and data.ui.mainFrame.visible then
                 local player = game.get_player(playerIndex)
                 productionTables.refresh(player)
@@ -89,16 +89,16 @@ local function onGuiTextChanged(event)
 
     if tonumber(event.text) then
         local number = tonumber(event.text)
-        if not global.entities_partition_lookup[number] then return end
-        local partition = global.entities_partition_lookup[number]
-        local entity = global.entities[partition][number]
+        if not storage.entities_partition_lookup[number] then return end
+        local partition = storage.entities_partition_lookup[number]
+        local entity = storage.entities[partition][number]
         logger.log2(string.format("DEBUG ENTITY %d Found entity in partition %d",number, partition))
         logger.log2(string.format("DEBUG ENTITY %d Recipe is %s",number, entity.recipe))
 
-        for i, consumer in ipairs(global.consumers[number]) do
+        for i, consumer in ipairs(storage.consumers[number]) do
             logger.log2(string.format("DEBUG ENTITY %d Consumes %d: item=%s amount=%.1f recipe=%s",number, i, consumer.item, consumer.amount, consumer.recipe))
         end
-        for i, producer in ipairs(global.producers[number]) do
+        for i, producer in ipairs(storage.producers[number]) do
             logger.log2(string.format("DEBUG ENTITY %d Produces %d: item=%s amount=%.1f recipe=%s",number, i, producer.item, producer.amount, producer.recipe))
         end
         return

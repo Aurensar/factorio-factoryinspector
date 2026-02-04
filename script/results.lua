@@ -8,7 +8,7 @@ local function getAggregateConsumption(item, timePeriodInSeconds)
     local startTick = game.tick - (timePeriodInSeconds * 60) 
     local resultsToReturn = {}
 
-    for recipe, resultsDB in pairs(global.results[item].consumed) do
+    for recipe, resultsDB in pairs(storage.results[item].consumed) do
         if #resultsDB > 0 then
             resultsToReturn[recipe] = { times = 0, amount = 0}
             for i = #resultsDB, 1, -1 do
@@ -30,7 +30,7 @@ local function getAggregateProduction(item, timePeriodInSeconds)
     local startTick = game.tick - (timePeriodInSeconds * 60) 
     local resultsToReturn = {}
 
-    for recipe, resultsDB in pairs(global.results[item].produced) do
+    for recipe, resultsDB in pairs(storage.results[item].produced) do
         if #resultsDB > 0 then
             resultsToReturn[recipe] = { times = 0, amount = 0}
             for i = #resultsDB, 1, -1 do
@@ -49,7 +49,7 @@ end
 
 local function getOrderedItemList()
     local resultsToReturn = {}
-    for item, _ in pairs(global.results) do
+    for item, _ in pairs(storage.results) do
         table.insert(resultsToReturn, item)
     end
     table.sort(resultsToReturn)
@@ -57,8 +57,8 @@ local function getOrderedItemList()
 end
 
 local function addConsumptionData(item, recipe, times, amount)
-    --table.insert(global.results[item].consumed[recipe], { tick = game.tick, times = times, amount = amount })
-    --table.insert(global.results[item].consumed.total, { tick = game.tick, times = times, amount = amount })
+    --table.insert(storage.results[item].consumed[recipe], { tick = game.tick, times = times, amount = amount })
+    --table.insert(storage.results[item].consumed.total, { tick = game.tick, times = times, amount = amount })
 
     if not consumptionBuffer[item] then consumptionBuffer[item] = {} end
     if not consumptionBuffer[item][recipe] then consumptionBuffer[item][recipe] = {} end
@@ -68,8 +68,8 @@ local function addConsumptionData(item, recipe, times, amount)
 end
 
 local function addProductionData(item, recipe, times, amount)
-    --table.insert(global.results[item].produced[recipe], { tick = game.tick, times = times, amount = amount })
-    --table.insert(global.results[item].produced.total, { tick = game.tick, times = times, amount = amount })
+    --table.insert(storage.results[item].produced[recipe], { tick = game.tick, times = times, amount = amount })
+    --table.insert(storage.results[item].produced.total, { tick = game.tick, times = times, amount = amount })
 
     if not productionBuffer[item] then productionBuffer[item] = {} end
     if not productionBuffer[item][recipe] then productionBuffer[item][recipe] = {} end
@@ -96,9 +96,9 @@ local function flushBuffer(buffer, getTargetDB)
 end
 
 local function flushBuffers()
-   local total, created = flushBuffer(consumptionBuffer, function(item, recipe) return global.results[item].consumed[recipe] end)
+   local total, created = flushBuffer(consumptionBuffer, function(item, recipe) return storage.results[item].consumed[recipe] end)
    logger.log(string.format("Flushed consumption buffer of %d items, creating %d records", total, created))
-   total, created = flushBuffer(productionBuffer, function(item, recipe) return global.results[item].produced[recipe] end)
+   total, created = flushBuffer(productionBuffer, function(item, recipe) return storage.results[item].produced[recipe] end)
    logger.log(string.format("Flushed production buffer of %d items, creating %d records", total, created))
    productionBuffer = {}
    consumptionBuffer = {}
@@ -109,7 +109,7 @@ local function cleanupOldResults(timeInSeconds)
     local cleanupThresholdTick = game.tick - (timeInSeconds * 60) 
     local recordsCleaned, prodRecords, consRecords = 0, 0, 0
 
-    for item, itemDB in pairs(global.results) do
+    for item, itemDB in pairs(storage.results) do
         for recipe, recipeDB in pairs(itemDB.produced) do
             for i, entry in ipairs(recipeDB) do
                 prodRecords = prodRecords + 1

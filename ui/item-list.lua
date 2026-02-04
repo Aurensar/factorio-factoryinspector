@@ -22,11 +22,11 @@ function renderItem(ui_state, item, selected_item)
     local style = (selected) and "fi_button_fake_listbox_item_active" or "fi_button_fake_listbox_item"
     local tooltip = item
     local name, sprite
-    if game.item_prototypes[item] then 
-        name = game.item_prototypes[item].localised_name 
+    if prototypes.item[item] then 
+        name = prototypes.item[item].localised_name 
         sprite = "item/"..item
     else 
-        name = game.fluid_prototypes[item].localised_name 
+        name = prototypes.fluid[item].localised_name 
         sprite = "fluid/"..item
     end
 
