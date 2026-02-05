@@ -14,6 +14,8 @@ Factory Inspector is a Factorio mod (Lua) that measures per-recipe consumption a
 - Three launch configurations in `.vscode/launch.json`: basic debug, settings/data phase debug, and profiling
 - No build system — the mod directory structure is deployed as-is into Factorio's mod folder
 - Version is tracked in `info.json` and `changelog.txt` (keep both in sync)
+- **Every change** must have a corresponding line added to `changelog.txt`
+- **Every commit** must bump the patch version (e.g. 2.0.1 → 2.0.2) in both `info.json` and `changelog.txt`
 
 ## Architecture
 

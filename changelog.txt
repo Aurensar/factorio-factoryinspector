@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.2
+Date: 2026-02-05
+  Changes:
+    - Added surface_index to all production and consumption result records for future per-surface filtering support
+---------------------------------------------------------------------------------------------------
 Version: 2.0.1
 Date: 2026-02-05
   Bugfixes:

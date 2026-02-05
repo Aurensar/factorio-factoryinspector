@@ -25,11 +25,12 @@ local function updateProductionAndConsumptionStatsAM()
     for unit_number, data in pairs(storage.entities_am[current_am_partition]) do
         if data.entity.valid and data.previous_count and data.entity.products_finished and data.entity.products_finished > data.previous_count then
             local diff = data.entity.products_finished - data.previous_count
+            local surface_index = data.entity.surface_index
             for i, producer in ipairs(storage.producers[unit_number]) do
-                results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount)
+                results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount, surface_index)
             end
             for j, consumer in ipairs(storage.consumers[unit_number]) do
-                results.addConsumptionData(consumer.item, consumer.recipe, diff, diff*consumer.amount)
+                results.addConsumptionData(consumer.item, consumer.recipe, diff, diff*consumer.amount, surface_index)
             end
         end
 
@@ -52,11 +53,12 @@ local function updateProductionAndConsumptionStatsFurnace()
     for unit_number, data in pairs(storage.entities_furnace[current_furnace_partition]) do
         if data.entity.valid and data.previous_count and data.entity.products_finished and data.entity.products_finished > data.previous_count then
             local diff = data.entity.products_finished - data.previous_count
+            local surface_index = data.entity.surface_index
             for i, producer in ipairs(storage.producers[unit_number]) do
-                results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount)
+                results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount, surface_index)
             end
             for j, consumer in ipairs(storage.consumers[unit_number]) do
-                results.addConsumptionData(consumer.item, consumer.recipe, diff, diff*consumer.amount)
+                results.addConsumptionData(consumer.item, consumer.recipe, diff, diff*consumer.amount, surface_index)
             end
         end
         if not data.entity.valid then
@@ -76,11 +78,12 @@ end
 local function updateProductionAndConsumptionStatsMD()
     for unit_number, data in pairs(storage.entities_md[current_md_partition]) do
         if data.entity.valid and data.previous_progress and data.entity.mining_progress and data.entity.mining_progress < data.previous_progress then
+            local surface_index = data.entity.surface_index
             for i, producer in ipairs(storage.producers[unit_number]) do
-                results.addProductionData(producer.item, producer.recipe, 1, producer.amount)
+                results.addProductionData(producer.item, producer.recipe, 1, producer.amount, surface_index)
             end
             for j, consumer in ipairs(storage.consumers[unit_number]) do
-                results.addConsumptionData(consumer.item, consumer.recipe, 1, consumer.amount)
+                results.addConsumptionData(consumer.item, consumer.recipe, 1, consumer.amount, surface_index)
             end
         end
         if data.entity.valid then data.previous_progress = data.entity.mining_progress end
