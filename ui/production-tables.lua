@@ -6,7 +6,7 @@ productionTables = {}
 function productionTables.create(player)
     local ui_state = ui.ui_state(player)
 
-    ui_state.right_column.add{type="label", caption={"ui.production-stats"}, style="heading_3_label", ignored_by_interaction=true}
+    ui_state.right_column.add{type="label", caption={"ui.production-stats"}, style="caption_label", ignored_by_interaction=true}
 
     local prod_table_frame = ui_state.right_column.add{type="frame", direction="vertical", style="inside_deep_frame"}
     prod_table_frame.style.vertically_stretchable = true
@@ -19,7 +19,7 @@ function productionTables.create(player)
     ui_state.prod_table = ui_state.prod_table_holder.add { type = "table", column_count = 8, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
     ui_state.prod_table.style.horizontal_spacing = 16
 
-    ui_state.right_column.add{type="label", caption={"ui.consumption-stats"}, style="heading_3_label", ignored_by_interaction=true}
+    ui_state.right_column.add{type="label", caption={"ui.consumption-stats"}, style="caption_label", ignored_by_interaction=true}
 
     local cons_table_frame = ui_state.right_column.add{type="frame", direction="vertical", style="inside_deep_frame"}
     cons_table_frame.style.vertically_stretchable = true

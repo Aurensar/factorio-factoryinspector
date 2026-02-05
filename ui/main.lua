@@ -28,7 +28,7 @@ local function createHeader(player)
     separation.style.height = 24
 
     local button_close = titleBar.add{type="sprite-button", name="fi_title_bar_close_interface",
-        sprite="utility/close_white", hovered_sprite="utility/close_black", clicked_sprite="utility/close_black",
+        sprite="utility/close", hovered_sprite="utility/close_black", clicked_sprite="utility/close_black",
         tooltip={"fi.close_interface"}, style="frame_action_button", mouse_button_filter={"left"}}
     button_close.style.padding = 2
 end

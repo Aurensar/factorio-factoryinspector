@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 2026-02-05
+  Bugfixes:
+    - Fixed close button sprite (utility/close_white renamed to utility/close in 2.0)
+    - Fixed heading style (heading_3_label renamed to caption_label in 2.0)
+---------------------------------------------------------------------------------------------------
 Version: 2.0.0
 Date: 2026-02-05
   Changes:
