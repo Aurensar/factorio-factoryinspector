@@ -79,6 +79,15 @@ All persistent state lives in Factorio's `storage` table (survives save/load):
 
 Mining outputs and fuel consumption don't have real Factorio recipes. The mod creates synthetic recipe names (e.g., "Mine iron-ore") with display info stored in `storage.fakeRecipeLookup` so the UI can show them uniformly alongside real recipes.
 
+### Factorio 2.0 API Pitfalls
+
+- **`LuaSurface` has no `localised_name`**. For display names:
+  - Planets: use `surface.planet.prototype.localised_name` (`LuaPlanet` itself has no `localised_name` either — it's on the prototype)
+  - Space platforms: use `surface.platform.name` (this is the user-provided name)
+  - Fallback: `surface.name` (internal string, lowercase)
+- **Prototype-phase changes** (styles, shortcuts, hotkeys in `data.lua`/`prototypes/`) require a full Factorio restart, not just a save reload
+- **`localised_name`** is generally on prototypes, not on runtime Lua objects. When in doubt, go through `.prototype.localised_name`
+
 ## Coding Conventions
 
 - Modules use `require` with dot-separated paths (e.g., `require "script.logger"`) and return a table of public functions

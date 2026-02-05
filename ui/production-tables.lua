@@ -41,6 +41,14 @@ function productionTables.refresh(player)
     productionTables.refreshProduction(player)
 end
 
+local function getSurfaceDisplayName(surface_index)
+    local surface = game.surfaces[surface_index]
+    if not surface then return "Unknown" end
+    if surface.platform then return surface.platform.name end
+    if surface.planet then return surface.planet.prototype.localised_name end
+    return surface.name
+end
+
 local function getDisplayNameAndSpriteForDynamicRecipe(dynamicRecipe)
     if not storage.fakeRecipeLookup[dynamicRecipe] then
         logger.error("Lookup system can't find a match for dynamic recipe "..dynamicRecipe..", please report a bug")
@@ -87,8 +95,7 @@ function productionTables.refreshConsumption(player)
     for _, entry in ipairs(agg.entries) do
         if entry.times > 0 then
             local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(entry.recipe)
-            local surface = game.surfaces[entry.surface_index]
-            local surface_name = surface and surface.name or "Unknown"
+            local surface_name = getSurfaceDisplayName(entry.surface_index)
             table.add { type = "sprite", sprite = sprite }
             table.add { type = "label", caption = name, style="fi_table_text" }
             table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
@@ -138,8 +145,7 @@ function productionTables.refreshProduction(player)
     for _, entry in ipairs(agg.entries) do
         if entry.times > 0 then
             local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(entry.recipe)
-            local surface = game.surfaces[entry.surface_index]
-            local surface_name = surface and surface.name or "Unknown"
+            local surface_name = getSurfaceDisplayName(entry.surface_index)
             table.add { type = "sprite", sprite = sprite }
             table.add { type = "label", caption = name, style="fi_table_text" }
             table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
