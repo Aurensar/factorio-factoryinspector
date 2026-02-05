@@ -35,9 +35,10 @@ end
 
 local function enrolConsumedSolidFuel(entity, recipe)
     if entity.burner and entity.burner.currently_burning then
-        local entity_power_use = prototypes.entity[entity.name].energy_usage * 60
-        local item_power_value = entity.burner.currently_burning.fuel_value
-    
+        local fuel_prototype = entity.burner.currently_burning.name
+        local entity_power_use = entity.prototype.energy_usage * 60
+        local item_power_value = fuel_prototype.fuel_value
+
         local recipeName, time_in_seconds
         if recipe then
             time_in_seconds = recipe.energy -- multiplied by building speed?
@@ -52,10 +53,10 @@ local function enrolConsumedSolidFuel(entity, recipe)
             -- no recipe, and not a miner - not something we want to track
             return
         end
-    
+
         local per_craft = entity_power_use / item_power_value * time_in_seconds
-        table.insert(storage.consumers[entity.unit_number], {entity=entity, item=entity.burner.currently_burning.name, amount=per_craft, recipe=recipeName})
-        initResults(entity.burner.currently_burning.name, recipeName)
+        table.insert(storage.consumers[entity.unit_number], {entity=entity, item=fuel_prototype.name, amount=per_craft, recipe=recipeName})
+        initResults(fuel_prototype.name, recipeName)
     end
 end
 
@@ -78,7 +79,7 @@ local function enrolConsumedFluidFuel(entity, recipe)
         end
 
         if fuel then
-            local entity_power_use = prototypes.entity[entity.name].energy_usage * 60
+            local entity_power_use = entity.prototype.energy_usage * 60
             local item_power_value = prototypes.fluid[fuel].fuel_value
             local per_craft = entity_power_use / item_power_value * recipe.energy
             table.insert(storage.consumers[entity.unit_number], {entity=entity, item=fuel, amount=per_craft, recipe=recipe.name.." fluid fuel"})

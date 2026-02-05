@@ -1,7 +1,11 @@
 ---------------------------------------------------------------------------------------------------
-Version: 1.1.25
-Date: ????
+Version: 2.0.0
+Date: 2026-02-05
   Changes:
+    - Migrated mod from Factorio 1.1 to 2.0 (global→storage, prototypes API, shortcut icon format, event handler updates)
+    - Removed unused GUI styles that referenced parent styles removed in 2.0
+    - Fixed furnace previous_recipe lookup (now returns RecipeIDAndQualityIDPair in 2.0, not LuaRecipe)
+    - Fixed burner fuel_value lookup (currently_burning now returns ItemIDAndQualityIDPair in 2.0)
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.24
 Date: 2024-04-21

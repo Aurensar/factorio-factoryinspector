@@ -1,8 +1,8 @@
 local function getRecipe(entity)
     if entity.type == "mining-drill" then return nil end
-    local recipe = entity.get_recipe() 
-    if entity.type == "furnace" and entity.previous_recipe then 
-        recipe = entity.previous_recipe
+    local recipe = entity.get_recipe()
+    if not recipe and entity.type == "furnace" and entity.previous_recipe then
+        recipe = prototypes.recipe[entity.previous_recipe.name]
     end
     return recipe
 end
