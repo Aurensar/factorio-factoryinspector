@@ -16,7 +16,7 @@ function productionTables.create(player)
     ui_state.prod_table_holder.style.vertically_stretchable = true    
     ui_state.prod_table_holder.style.padding = { 10,10 }
 
-    ui_state.prod_table = ui_state.prod_table_holder.add { type = "table", column_count = 8, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
+    ui_state.prod_table = ui_state.prod_table_holder.add { type = "table", column_count = 9, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
     ui_state.prod_table.style.horizontal_spacing = 16
 
     ui_state.right_column.add{type="label", caption={"ui.consumption-stats"}, style="caption_label", ignored_by_interaction=true}
@@ -29,7 +29,7 @@ function productionTables.create(player)
     ui_state.cons_table_holder.style.vertically_stretchable = true
     ui_state.cons_table_holder.style.padding = { 10,10 }
 
-    ui_state.cons_table = ui_state.cons_table_holder.add { type = "table", column_count = 8, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
+    ui_state.cons_table = ui_state.cons_table_holder.add { type = "table", column_count = 9, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
     ui_state.cons_table.style.horizontal_spacing = 16
 
     productionTables.refreshConsumption(player)
@@ -74,36 +74,41 @@ function productionTables.refreshConsumption(player)
     table.add { type = "label", caption = "", style="fi_table_sprite_heading" } -- for the sprite
     table.add { type = "label", caption = {"ui.recipe-name"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.recipe-name-internal"}, style="fi_table_text_heading" }
+    table.add { type = "label", caption = {"ui.surface"}, style="fi_table_surface_heading" }
     table.add { type = "label", caption = {"ui.times-consumed"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.amount-consumed"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.per-sec"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.per-min"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.percent"}, style="fi_table_number_heading" }
 
-    local results = results.getAggregateConsumption(selected_item, 120)
-    if not results or not results.total then return end
+    local agg = results.getAggregateConsumption(selected_item, 120)
+    if not agg then return end
 
-    for recipe, data in pairs(results) do
-        if recipe ~= "total" and data.times > 0 then
-            local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(recipe)
+    for _, entry in ipairs(agg.entries) do
+        if entry.times > 0 then
+            local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(entry.recipe)
+            local surface = game.surfaces[entry.surface_index]
+            local surface_name = surface and surface.name or "Unknown"
             table.add { type = "sprite", sprite = sprite }
             table.add { type = "label", caption = name, style="fi_table_text" }
-            table.add { type = "label", caption = recipe, style="fi_table_text" }
-            table.add { type = "label", caption = string.format("%d", data.times), style="fi_table_number" }
-            table.add { type = "label", caption = string.format("%d", data.amount), style="fi_table_number" }
-            table.add { type = "label", caption = string.format("%.1f", data.per_sec), style="fi_table_number" }
-            table.add { type = "label", caption = string.format("%d", data.per_min), style="fi_table_number" }
-            table.add { type = "label", caption = string.format("%d", (data.amount / results.total.amount * 100)), style="fi_table_number" }
+            table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
+            table.add { type = "label", caption = surface_name, style="fi_table_surface" }
+            table.add { type = "label", caption = string.format("%d", entry.times), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", entry.amount), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%.1f", entry.per_sec), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", entry.per_min), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", (entry.amount / agg.total.amount * 100)), style="fi_table_number" }
         end
     end
 
     table.add { type = "sprite", sprite = ""}
     table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
-    table.add { type = "label", caption = string.format("%d", results.total.times), style="fi_table_number_heading" }
-    table.add { type = "label", caption = string.format("%d", results.total.amount), style="fi_table_number_heading"}
-    table.add { type = "label", caption = string.format("%.1f", results.total.per_sec), style="fi_table_number_heading" }
-    table.add { type = "label", caption = string.format("%d", results.total.per_min), style="fi_table_number_heading" }
+    table.add { type = "label", caption = "", style="fi_table_surface_heading" }
+    table.add { type = "label", caption = string.format("%d", agg.total.times), style="fi_table_number_heading" }
+    table.add { type = "label", caption = string.format("%d", agg.total.amount), style="fi_table_number_heading"}
+    table.add { type = "label", caption = string.format("%.1f", agg.total.per_sec), style="fi_table_number_heading" }
+    table.add { type = "label", caption = string.format("%d", agg.total.per_min), style="fi_table_number_heading" }
     table.add { type = "label", caption = string.format("%d", 100), style="fi_table_number_heading" }
 end
 
@@ -120,35 +125,40 @@ function productionTables.refreshProduction(player)
     table.add { type = "label", caption = "", style="fi_table_sprite_heading" } -- for the sprite
     table.add { type = "label", caption = {"ui.recipe-name"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.recipe-name-internal"}, style="fi_table_text_heading" }
+    table.add { type = "label", caption = {"ui.surface"}, style="fi_table_surface_heading" }
     table.add { type = "label", caption = {"ui.times-produced"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.amount-produced"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.per-sec"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.per-min"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.percent"}, style="fi_table_number_heading" }
 
-    local results = results.getAggregateProduction(selected_item, 120)
-    if not results or not results.total then return end
+    local agg = results.getAggregateProduction(selected_item, 120)
+    if not agg then return end
 
-    for recipe, data in pairs(results) do
-        if recipe ~= "total" and data.times > 0 then
-            local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(recipe)
+    for _, entry in ipairs(agg.entries) do
+        if entry.times > 0 then
+            local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(entry.recipe)
+            local surface = game.surfaces[entry.surface_index]
+            local surface_name = surface and surface.name or "Unknown"
             table.add { type = "sprite", sprite = sprite }
             table.add { type = "label", caption = name, style="fi_table_text" }
-            table.add { type = "label", caption = recipe, style="fi_table_text" }
-            table.add { type = "label", caption = string.format("%d", data.times), style="fi_table_number" }
-            table.add { type = "label", caption = string.format("%d", data.amount), style="fi_table_number" }
-            table.add { type = "label", caption = string.format("%.1f", data.per_sec), style="fi_table_number" }
-            table.add { type = "label", caption = string.format("%d", data.per_min), style="fi_table_number" }
-            table.add { type = "label", caption = string.format("%d", (data.amount / results.total.amount * 100)), style="fi_table_number" }
+            table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
+            table.add { type = "label", caption = surface_name, style="fi_table_surface" }
+            table.add { type = "label", caption = string.format("%d", entry.times), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", entry.amount), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%.1f", entry.per_sec), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", entry.per_min), style="fi_table_number" }
+            table.add { type = "label", caption = string.format("%d", (entry.amount / agg.total.amount * 100)), style="fi_table_number" }
         end
     end
 
     table.add { type = "sprite", sprite = ""}
     table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
-    table.add { type = "label", caption = string.format("%d", results.total.times), style="fi_table_number_heading" }
-    table.add { type = "label", caption = string.format("%d", results.total.amount), style="fi_table_number_heading"}
-    table.add { type = "label", caption = string.format("%.1f", results.total.per_sec), style="fi_table_number_heading" }
-    table.add { type = "label", caption = string.format("%d", results.total.per_min), style="fi_table_number_heading" }
+    table.add { type = "label", caption = "", style="fi_table_surface_heading" }
+    table.add { type = "label", caption = string.format("%d", agg.total.times), style="fi_table_number_heading" }
+    table.add { type = "label", caption = string.format("%d", agg.total.amount), style="fi_table_number_heading"}
+    table.add { type = "label", caption = string.format("%.1f", agg.total.per_sec), style="fi_table_number_heading" }
+    table.add { type = "label", caption = string.format("%d", agg.total.per_min), style="fi_table_number_heading" }
     table.add { type = "label", caption = string.format("%d", 100), style="fi_table_number_heading" }
 end

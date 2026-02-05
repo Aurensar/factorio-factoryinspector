@@ -3,52 +3,76 @@ local logger = require "script.logger"
 local productionBuffer = {}
 local consumptionBuffer = {}
 
-local function getAggregateConsumption(item, timePeriodInSeconds, surface_index)
+local function getAggregateConsumption(item, timePeriodInSeconds)
     if not timePeriodInSeconds then timePeriodInSeconds = 60 end
     local startTick = game.tick - (timePeriodInSeconds * 60)
-    local resultsToReturn = {}
+    local entries = {}
+    local total = { times = 0, amount = 0 }
+    local grouped = {}
 
     for recipe, resultsDB in pairs(storage.results[item].consumed) do
-        if #resultsDB > 0 then
+        if recipe ~= "total" and #resultsDB > 0 then
             for i = #resultsDB, 1, -1 do
-                if resultsDB[i].tick > startTick and (not surface_index or resultsDB[i].surface_index == surface_index) then
-                    if not resultsToReturn[recipe] then resultsToReturn[recipe] = { times = 0, amount = 0} end
-                    resultsToReturn[recipe].times = resultsToReturn[recipe].times + resultsDB[i].times
-                    resultsToReturn[recipe].amount = resultsToReturn[recipe].amount + resultsDB[i].amount
+                if resultsDB[i].tick > startTick then
+                    local si = resultsDB[i].surface_index or 0
+                    local key = recipe .. "\0" .. si
+                    if not grouped[key] then grouped[key] = { recipe = recipe, surface_index = si, times = 0, amount = 0 } end
+                    grouped[key].times = grouped[key].times + resultsDB[i].times
+                    grouped[key].amount = grouped[key].amount + resultsDB[i].amount
                 end
-            end
-            if resultsToReturn[recipe] then
-                resultsToReturn[recipe].per_sec = resultsToReturn[recipe].amount / timePeriodInSeconds
-                resultsToReturn[recipe].per_min = resultsToReturn[recipe].per_sec * 60
             end
         end
     end
 
-    return resultsToReturn
+    for _, entry in pairs(grouped) do
+        entry.per_sec = entry.amount / timePeriodInSeconds
+        entry.per_min = entry.per_sec * 60
+        total.times = total.times + entry.times
+        total.amount = total.amount + entry.amount
+        table.insert(entries, entry)
+    end
+
+    if total.amount == 0 then return nil end
+    total.per_sec = total.amount / timePeriodInSeconds
+    total.per_min = total.per_sec * 60
+
+    return { entries = entries, total = total }
 end
 
-local function getAggregateProduction(item, timePeriodInSeconds, surface_index)
+local function getAggregateProduction(item, timePeriodInSeconds)
     if not timePeriodInSeconds then timePeriodInSeconds = 60 end
     local startTick = game.tick - (timePeriodInSeconds * 60)
-    local resultsToReturn = {}
+    local entries = {}
+    local total = { times = 0, amount = 0 }
+    local grouped = {}
 
     for recipe, resultsDB in pairs(storage.results[item].produced) do
-        if #resultsDB > 0 then
+        if recipe ~= "total" and #resultsDB > 0 then
             for i = #resultsDB, 1, -1 do
-                if resultsDB[i].tick > startTick and (not surface_index or resultsDB[i].surface_index == surface_index) then
-                    if not resultsToReturn[recipe] then resultsToReturn[recipe] = { times = 0, amount = 0} end
-                    resultsToReturn[recipe].times = resultsToReturn[recipe].times + resultsDB[i].times
-                    resultsToReturn[recipe].amount = resultsToReturn[recipe].amount + resultsDB[i].amount
+                if resultsDB[i].tick > startTick then
+                    local si = resultsDB[i].surface_index or 0
+                    local key = recipe .. "\0" .. si
+                    if not grouped[key] then grouped[key] = { recipe = recipe, surface_index = si, times = 0, amount = 0 } end
+                    grouped[key].times = grouped[key].times + resultsDB[i].times
+                    grouped[key].amount = grouped[key].amount + resultsDB[i].amount
                 end
-            end
-            if resultsToReturn[recipe] then
-                resultsToReturn[recipe].per_sec = resultsToReturn[recipe].amount / timePeriodInSeconds
-                resultsToReturn[recipe].per_min = resultsToReturn[recipe].per_sec * 60
             end
         end
     end
 
-    return resultsToReturn
+    for _, entry in pairs(grouped) do
+        entry.per_sec = entry.amount / timePeriodInSeconds
+        entry.per_min = entry.per_sec * 60
+        total.times = total.times + entry.times
+        total.amount = total.amount + entry.amount
+        table.insert(entries, entry)
+    end
+
+    if total.amount == 0 then return nil end
+    total.per_sec = total.amount / timePeriodInSeconds
+    total.per_min = total.per_sec * 60
+
+    return { entries = entries, total = total }
 end
 
 local function getOrderedItemList()

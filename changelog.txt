@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.3
+Date: 2026-02-05
+  Features:
+    - Production and consumption tables now show a Surface column, with separate rows per (recipe, surface) pair
+---------------------------------------------------------------------------------------------------
 Version: 2.0.2
 Date: 2026-02-05
   Changes:

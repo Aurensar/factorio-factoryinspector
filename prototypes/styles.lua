@@ -82,6 +82,19 @@ styles["fi_table_text"] = {
     maximal_width = 250
 }
 
+styles["fi_table_surface_heading"] = {
+    type = "label_style",
+    font = "default-bold",
+    width = 150,
+    maximal_width = 150
+}
+
+styles["fi_table_surface"] = {
+    type = "label_style",
+    width = 150,
+    maximal_width = 150
+}
+
 styles["fi_table_number"] = {
     type = "label_style",
     width = 120,
