@@ -3,3 +3,4 @@ todo.txt
 *.code-workspace
 *.zip
 .vscode
+.claude
