@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.6
+Date: 2026-02-09
+  Features:
+    - Added quality support: production and consumption tables now show a Quality column, with separate rows per quality tier
+    - Tracks recipe quality for assembling machines and furnaces, using result_quality when available
+    - Fluids and mining drill outputs default to normal quality
+---------------------------------------------------------------------------------------------------
 Version: 2.0.5
 Date: 2026-02-05
   Changes:

@@ -105,23 +105,18 @@ local function updateConsumersAndProducers(entity)
     storage.consumers[entity.unit_number] = {}
     storage.producers[entity.unit_number] = {}
 
-    local recipe = recipe_functions.getRecipe(entity)
+    local recipe, quality = recipe_functions.getRecipe(entity)
     -- consumption
-    if recipe then 
-        input_output_calculator.enrolConsumedRecipeIngredients(entity, recipe) 
-        input_output_calculator.enrolConsumedSolidFuel(entity, recipe)
+    if recipe then
+        input_output_calculator.enrolConsumedRecipeIngredients(entity, recipe, quality)
+        input_output_calculator.enrolConsumedSolidFuel(entity, recipe, quality)
         input_output_calculator.enrolConsumedFluidFuel(entity, recipe)
         end
     if entity.type == "mining-drill" then input_output_calculator.enrolConsumedMiningFluid(entity) end
 
     -- production
     if entity.type == "mining-drill" then input_output_calculator.enrolProducedMiningOutputs(entity) end
-    if recipe then input_output_calculator.enrolProducedRecipeOutputs(entity, recipe) end
-
-    -- for i, consumer in ipairs(storage.consumers[entity.unit_number]) do
-    --      logger.log(string.format("Entity %d %s uses %.2f %s per craft on recipe %s",
-    --                          entity.unit_number, entity.name, consumer.amount, consumer.item, consumer.recipe))
-    -- end
+    if recipe then input_output_calculator.enrolProducedRecipeOutputs(entity, recipe, quality) end
 end
 
 local function addEntityToPartition(database, partition_data, entity, cache, entityDataToSave)
@@ -141,23 +136,24 @@ local function addEntityToPartition(database, partition_data, entity, cache, ent
 end
 
 local function checkExistingEntityForChanges(entity, partition)
-    local recipeName = recipe_functions.getRecipeName(entity)
-    if storage.entities[partition][entity.unit_number].recipe == recipeName then return end
+    local recipeName, quality = recipe_functions.getRecipeName(entity)
+    local stored = storage.entities[partition][entity.unit_number]
+    if stored.recipe == recipeName and stored.recipe_quality == quality then return end
 
     logger.log(string.format("Recipe change for %d %s", entity.unit_number, entity.name))
-    if storage.entities[entity.unit_number] then
-        logger.log(string.format("Recipe change: Old recipe [%s]", storage.entities[entity.unit_number].recipe))
-    else
-        logger.log(string.format("Recipe change: Old recipe not set"))
-    end
-    logger.log(string.format("Recipe change: New recipe [%s]", recipeName))
+    logger.log(string.format("Recipe change: Old recipe [%s] quality [%s]", stored.recipe or "", stored.recipe_quality or ""))
+    logger.log(string.format("Recipe change: New recipe [%s] quality [%s]", recipeName, quality))
     updateConsumersAndProducers(entity)
-    storage.entities[partition][entity.unit_number].recipe = recipeName
+    stored.recipe = recipeName
+    stored.recipe_quality = quality
 end
 
 local function enrolNewEntity(entity)
     updateConsumersAndProducers(entity)
-    addEntityToPartition(storage.entities, storage.global_partition_data, entity, storage.entities_partition_lookup, function(e) return { entity=e, recipe=recipe_functions.getRecipeName(e)} end)
+    addEntityToPartition(storage.entities, storage.global_partition_data, entity, storage.entities_partition_lookup, function(e)
+        local name, q = recipe_functions.getRecipeName(e)
+        return { entity=e, recipe=name, recipe_quality=q }
+    end)
     if entity.type == "assembling-machine" then
         addEntityToPartition(storage.entities_am, storage.am_partition_data, entity, storage.entities_am_partition_lookup, function(e) return { entity=e } end)
     end

@@ -96,10 +96,10 @@ local function onGuiTextChanged(event)
         logger.log2(string.format("DEBUG ENTITY %d Recipe is %s",number, entity.recipe))
 
         for i, consumer in ipairs(storage.consumers[number]) do
-            logger.log2(string.format("DEBUG ENTITY %d Consumes %d: item=%s amount=%.1f recipe=%s",number, i, consumer.item, consumer.amount, consumer.recipe))
+            logger.log2(string.format("DEBUG ENTITY %d Consumes %d: item=%s amount=%.1f recipe=%s quality=%s",number, i, consumer.item, consumer.amount, consumer.recipe, consumer.quality or "normal"))
         end
         for i, producer in ipairs(storage.producers[number]) do
-            logger.log2(string.format("DEBUG ENTITY %d Produces %d: item=%s amount=%.1f recipe=%s",number, i, producer.item, producer.amount, producer.recipe))
+            logger.log2(string.format("DEBUG ENTITY %d Produces %d: item=%s amount=%.1f recipe=%s quality=%s",number, i, producer.item, producer.amount, producer.recipe, producer.quality or "normal"))
         end
         return
     end
