@@ -36,9 +36,7 @@ end
 
 local function enrolConsumedSolidFuel(entity, recipe, quality)
     if entity.burner and entity.burner.currently_burning then
-        local fuel_id = entity.burner.currently_burning
-        local fuel_prototype = prototypes.item[fuel_id.name]
-        local fuel_quality = fuel_id.quality or "normal"
+        local fuel_prototype = entity.burner.currently_burning
         local entity_power_use = entity.prototype.energy_usage * 60
         local item_power_value = fuel_prototype.fuel_value
 
@@ -58,8 +56,8 @@ local function enrolConsumedSolidFuel(entity, recipe, quality)
         end
 
         local per_craft = entity_power_use / item_power_value * time_in_seconds
-        table.insert(storage.consumers[entity.unit_number], {entity=entity, item=fuel_id.name, amount=per_craft, recipe=recipeName, quality=fuel_quality})
-        initResults(fuel_id.name, recipeName)
+        table.insert(storage.consumers[entity.unit_number], {entity=entity, item=fuel_prototype.name, amount=per_craft, recipe=recipeName, quality="normal"})
+        initResults(fuel_prototype.name, recipeName)
     end
 end
 

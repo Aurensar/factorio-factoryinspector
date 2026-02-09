@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.1
+Date: 2026-02-09
+  Bugfixes:
+    - Fixed crash in solid fuel tracking caused by incorrect API usage for burner.currently_burning
+---------------------------------------------------------------------------------------------------
 Version: 2.1.0
 Date: 2026-02-09
   Features:
