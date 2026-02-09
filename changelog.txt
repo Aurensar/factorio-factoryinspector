@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.2
+Date: 2026-02-09
+  Bugfixes:
+    - Fixed crash in solid fuel tracking: handle burner.currently_burning as both ItemIDAndQualityIDPair and LuaItemPrototype, with fallback to prototypes.item lookup
+---------------------------------------------------------------------------------------------------
 Version: 2.1.1
 Date: 2026-02-09
   Bugfixes:
