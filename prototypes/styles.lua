@@ -101,3 +101,16 @@ styles["fi_table_number"] = {
     maximal_width = 120,
     horizontal_align = "center"
 }
+
+styles["fi_table_quality_heading"] = {
+    type = "label_style",
+    font = "default-bold",
+    width = 100,
+    maximal_width = 100
+}
+
+styles["fi_table_quality"] = {
+    type = "label_style",
+    width = 100,
+    maximal_width = 100
+}

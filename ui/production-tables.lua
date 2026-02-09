@@ -89,7 +89,7 @@ function productionTables.refreshConsumption(player)
     table.add { type = "label", caption = {"ui.recipe-name"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.recipe-name-internal"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.surface"}, style="fi_table_surface_heading" }
-    table.add { type = "label", caption = {"ui.quality"}, style="fi_table_text_heading" }
+    table.add { type = "label", caption = {"ui.quality"}, style="fi_table_quality_heading" }
     table.add { type = "label", caption = {"ui.times-consumed"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.amount-consumed"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.per-sec"}, style="fi_table_number_heading" }
@@ -108,7 +108,7 @@ function productionTables.refreshConsumption(player)
             table.add { type = "label", caption = name, style="fi_table_text" }
             table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
             table.add { type = "label", caption = surface_name, style="fi_table_surface" }
-            table.add { type = "label", caption = quality_name, style="fi_table_text" }
+            table.add { type = "label", caption = quality_name, style="fi_table_quality" }
             table.add { type = "label", caption = string.format("%d", entry.times), style="fi_table_number" }
             table.add { type = "label", caption = string.format("%d", entry.amount), style="fi_table_number" }
             table.add { type = "label", caption = string.format("%.1f", entry.per_sec), style="fi_table_number" }
@@ -121,7 +121,7 @@ function productionTables.refreshConsumption(player)
     table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = "", style="fi_table_surface_heading" }
-    table.add { type = "label", caption = "", style="fi_table_text_heading" }
+    table.add { type = "label", caption = "", style="fi_table_quality_heading" }
     table.add { type = "label", caption = string.format("%d", agg.total.times), style="fi_table_number_heading" }
     table.add { type = "label", caption = string.format("%d", agg.total.amount), style="fi_table_number_heading"}
     table.add { type = "label", caption = string.format("%.1f", agg.total.per_sec), style="fi_table_number_heading" }
@@ -143,7 +143,7 @@ function productionTables.refreshProduction(player)
     table.add { type = "label", caption = {"ui.recipe-name"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.recipe-name-internal"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.surface"}, style="fi_table_surface_heading" }
-    table.add { type = "label", caption = {"ui.quality"}, style="fi_table_text_heading" }
+    table.add { type = "label", caption = {"ui.quality"}, style="fi_table_quality_heading" }
     table.add { type = "label", caption = {"ui.times-produced"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.amount-produced"}, style="fi_table_number_heading" }
     table.add { type = "label", caption = {"ui.per-sec"}, style="fi_table_number_heading" }
@@ -162,7 +162,7 @@ function productionTables.refreshProduction(player)
             table.add { type = "label", caption = name, style="fi_table_text" }
             table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
             table.add { type = "label", caption = surface_name, style="fi_table_surface" }
-            table.add { type = "label", caption = quality_name, style="fi_table_text" }
+            table.add { type = "label", caption = quality_name, style="fi_table_quality" }
             table.add { type = "label", caption = string.format("%d", entry.times), style="fi_table_number" }
             table.add { type = "label", caption = string.format("%d", entry.amount), style="fi_table_number" }
             table.add { type = "label", caption = string.format("%.1f", entry.per_sec), style="fi_table_number" }
@@ -175,7 +175,7 @@ function productionTables.refreshProduction(player)
     table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = "", style="fi_table_surface_heading" }
-    table.add { type = "label", caption = "", style="fi_table_text_heading" }
+    table.add { type = "label", caption = "", style="fi_table_quality_heading" }
     table.add { type = "label", caption = string.format("%d", agg.total.times), style="fi_table_number_heading" }
     table.add { type = "label", caption = string.format("%d", agg.total.amount), style="fi_table_number_heading"}
     table.add { type = "label", caption = string.format("%.1f", agg.total.per_sec), style="fi_table_number_heading" }
