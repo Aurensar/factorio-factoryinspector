@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.4
+Date: 2026-02-09
+  Features:
+    - Added verification console commands (/fi-verify-start, /fi-verify-report, /fi-verify-status) to compare mod tracking against Factorio's built-in production statistics
+    - Verification report now sorts diverged items by severity, shows only top 10, and collapses untracked items into a summary count
+---------------------------------------------------------------------------------------------------
 Version: 2.1.3
 Date: 2026-02-09
   Changes:

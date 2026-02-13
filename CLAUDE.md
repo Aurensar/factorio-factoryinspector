@@ -81,6 +81,7 @@ Mining outputs and fuel consumption don't have real Factorio recipes. The mod cr
 
 ### Factorio 2.0 API Pitfalls
 
+- **IMPORTANT: Always verify API usage against the latest docs** at https://lua-api.factorio.com/latest/ before writing code that calls Factorio APIs. Many properties from 1.1 were renamed or changed to methods in 2.0 (e.g., `force.item_production_statistics` became `force.get_item_production_statistics(surface)`). Do not rely on memory or older examples — fetch the current docs for the relevant class.
 - **`LuaSurface` has no `localised_name`**. For display names:
   - Planets: use `surface.planet.prototype.localised_name` (`LuaPlanet` itself has no `localised_name` either — it's on the prototype)
   - Space platforms: use `surface.platform.name` (this is the user-provided name)
