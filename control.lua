@@ -37,17 +37,15 @@ script.on_event(defines.events.on_gui_click, event_handlers.onGuiClick)
 script.on_event(defines.events.on_gui_text_changed, event_handlers.onGuiTextChanged)
 script.on_event(defines.events.on_gui_opened, event_handlers.onGuiOpened)
 script.on_event(defines.events.on_gui_closed, event_handlers.onGuiClosed)
+script.on_event(defines.events.on_runtime_mod_setting_changed, event_handlers.onRuntimeModSettingChanged)
 
 local verification = require "script.verification"
-commands.add_command("fi-verify-start", "Start Factory Inspector verification snapshot", function(command)
+commands.add_command("fi-verify-report", "Show the latest background verification report", function(command)
     local player = game.get_player(command.player_index)
-    if player then verification.takeSnapshot(player) end
+    if player then verification.formatReport(player) end
 end)
-commands.add_command("fi-verify-report", "Compare current stats against snapshot", function(command)
+commands.add_command("fi-verify-now", "Force an immediate verification check", function(command)
+    verification.runBackgroundCheck()
     local player = game.get_player(command.player_index)
-    if player then verification.compareAndReport(player) end
-end)
-commands.add_command("fi-verify-status", "Show verification snapshot status", function(command)
-    local player = game.get_player(command.player_index)
-    if player then verification.reportStatus(player) end
+    if player then verification.formatReport(player) end
 end)

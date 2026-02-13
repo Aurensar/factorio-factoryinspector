@@ -2,6 +2,7 @@ local logger = require "script.logger"
 local entity_tracker = require "script.entity-tracker"
 local production_tracker = require "script.production-tracker"
 local results = require "script.results"
+local verification = require "script.verification"
 
 local function onBuiltEntity(event)
     local entity = event.entity
@@ -67,6 +68,10 @@ local function onGameTick(event)
     if game.tick % 300 == 0 then
         results.flushBuffers()
     end
+
+    if game.tick % verification.CHECK_INTERVAL == 0 then
+        verification.runBackgroundCheck()
+    end
 end
 
 local function onGuiClick(event)
@@ -118,10 +123,14 @@ local function onLuaShortcut(event)
 end
 
 local function onGuiClosed(event)
-    if event.element and string.find(event.element.name, "fi_frame_main_dialog") then 
+    if event.element and string.find(event.element.name, "fi_frame_main_dialog") then
         local player = game.get_player(event.player_index)
         fiMainFrame.close(player)
     end
+end
+
+local function onRuntimeModSettingChanged(event)
+    verification.onSettingChanged(event)
 end
 
 return {
@@ -131,5 +140,6 @@ return {
     onGuiClick = onGuiClick,
     onGuiTextChanged = onGuiTextChanged,
     onLuaShortcut = onLuaShortcut,
-    onGuiClosed = onGuiClosed
+    onGuiClosed = onGuiClosed,
+    onRuntimeModSettingChanged = onRuntimeModSettingChanged
 }  

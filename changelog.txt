@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.5
+Date: 2026-02-13
+  Features:
+    - Verification now runs automatically in the background every 3 minutes (when enabled in mod settings)
+    - Added "Enable verification checks" mod setting (off by default) to gate the verification system
+    - Alerts are only printed when significant tracking drift is detected (>20% and >50 absolute difference)
+    - Replaced /fi-verify-start and /fi-verify-status with /fi-verify-now for immediate checks
+    - /fi-verify-report now shows the latest background check results
+---------------------------------------------------------------------------------------------------
 Version: 2.1.4
 Date: 2026-02-09
   Features:

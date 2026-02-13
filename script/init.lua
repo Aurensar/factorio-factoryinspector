@@ -28,8 +28,9 @@ local function init()
     -- Reset the production and consumption stats
     storage.results = {}
 
-    -- Reset verification snapshot
+    -- Reset verification state
     storage.verification_snapshot = nil
+    storage.verification_last_report = nil
 
     -- Load standard partition configuration
     -- TODO make partitioning/performance management configurable

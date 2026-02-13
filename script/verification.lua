@@ -1,5 +1,15 @@
 local results = require "script.results"
 
+local SETTING_NAME = "factory-inspector-enable-verification"
+local CHECK_INTERVAL = 10800 -- 3 minutes in ticks
+local DIVERGENCE_THRESHOLD_PCT = 0.20 -- 20%
+local DIVERGENCE_THRESHOLD_ABS = 50
+local MAX_DIVERGED_SHOWN = 10
+
+local function isEnabled()
+    return settings.global[SETTING_NAME].value
+end
+
 -- Collect cumulative production stats across all surfaces for a force.
 -- Returns { items = { input_counts = {}, output_counts = {} }, fluids = { ... } }
 local function collectStats(force)
@@ -29,39 +39,17 @@ local function collectStats(force)
     return stats
 end
 
-local function takeSnapshot(player)
-    results.flushBuffers()
-
-    local stats = collectStats(player.force)
-    local snapshot = {
-        tick = game.tick,
-        items = stats.items,
-        fluids = stats.fluids
-    }
-
-    storage.verification_snapshot = snapshot
-    player.print("[FI Verify] Snapshot taken at tick " .. game.tick)
-end
-
-local function compareAndReport(player)
-    local snapshot = storage.verification_snapshot
-    if not snapshot then
-        player.print("[FI Verify] No snapshot exists. Run /fi-verify-start first.")
-        return
-    end
-
+-- Compute deltas between current stats and a snapshot, compare against mod's results,
+-- and return a report table. Used by both background checks and on-demand reports.
+local function computeReport(snapshot, force)
     local elapsed_ticks = game.tick - snapshot.tick
     local elapsed_seconds = elapsed_ticks / 60
-
-    if elapsed_seconds > 300 then
-        player.print("[FI Verify] Warning: snapshot is " .. string.format("%.0f", elapsed_seconds) .. " seconds old. Results older than 5 minutes are cleaned up and may be missing.")
-    end
 
     results.flushBuffers()
 
     -- Take current Factorio stats and compute deltas from snapshot
-    local game_deltas = {} -- game_deltas[item] = { produced = N, consumed = N }
-    local cur = collectStats(player.force)
+    local game_deltas = {}
+    local cur = collectStats(force)
 
     for item, count in pairs(cur.items.input_counts) do
         local prev = snapshot.items.input_counts[item] or 0
@@ -98,7 +86,7 @@ local function compareAndReport(player)
     end
 
     -- Compute mod deltas from storage.results
-    local mod_deltas = {} -- mod_deltas[item] = { produced = N, consumed = N }
+    local mod_deltas = {}
     local snapshot_tick = snapshot.tick
 
     for item, itemDB in pairs(storage.results) do
@@ -139,7 +127,6 @@ local function compareAndReport(player)
     local diverged = {}
     local untracked = {}
 
-    -- Collect all items that have any activity
     local all_items = {}
     for item, _ in pairs(game_deltas) do all_items[item] = true end
     for item, _ in pairs(mod_deltas) do all_items[item] = true end
@@ -154,7 +141,6 @@ local function compareAndReport(player)
         if not has_mod_data and has_game_data then
             table.insert(untracked, { item = item, game = gd, mod = md })
         elseif has_mod_data then
-            -- Check if within 5% tolerance
             local prod_ok = true
             local cons_ok = true
 
@@ -180,33 +166,118 @@ local function compareAndReport(player)
         end
     end
 
-    -- Compute severity score for diverged items (max absolute difference)
+    -- Compute severity and sort
     for _, d in ipairs(diverged) do
         local prod_diff = math.abs(d.game.produced - d.mod.produced)
         local cons_diff = math.abs(d.game.consumed - d.mod.consumed)
         d.max_diff = math.max(prod_diff, cons_diff)
     end
-
-    -- Sort diverged by severity (largest difference first)
     table.sort(diverged, function(a, b) return a.max_diff > b.max_diff end)
 
-    local total_active = #matched + #diverged + #untracked
-    local max_diverged_shown = 10
+    return {
+        elapsed_seconds = elapsed_seconds,
+        tick = game.tick,
+        matched = matched,
+        diverged = diverged,
+        untracked = untracked,
+        current_stats = cur
+    }
+end
 
-    -- Print report
-    player.print(string.format("[FI Verify] Report after %.0f seconds:", elapsed_seconds))
+-- Count items with significant divergence (for background alerting)
+local function countSignificantDivergences(report)
+    local count = 0
+    for _, d in ipairs(report.diverged) do
+        local prod_diff = math.abs(d.game.produced - d.mod.produced)
+        local cons_diff = math.abs(d.game.consumed - d.mod.consumed)
+        local prod_pct = d.game.produced > 0 and (prod_diff / d.game.produced) or 0
+        local cons_pct = d.game.consumed > 0 and (cons_diff / d.game.consumed) or 0
+
+        if (prod_diff > DIVERGENCE_THRESHOLD_ABS and prod_pct > DIVERGENCE_THRESHOLD_PCT)
+            or (cons_diff > DIVERGENCE_THRESHOLD_ABS and cons_pct > DIVERGENCE_THRESHOLD_PCT) then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+-- Run one background verification cycle. Called from onGameTick every CHECK_INTERVAL ticks.
+local function runBackgroundCheck()
+    if not isEnabled() then return end
+
+    -- Use the first player's force (typically "player" force in single-player)
+    local force = game.forces["player"]
+    if not force then return end
+
+    local snapshot = storage.verification_snapshot
+
+    if not snapshot then
+        -- First cycle: just take the initial snapshot
+        results.flushBuffers()
+        local stats = collectStats(force)
+        storage.verification_snapshot = {
+            tick = game.tick,
+            items = stats.items,
+            fluids = stats.fluids
+        }
+        return
+    end
+
+    -- Subsequent cycles: compare and store report, then take new snapshot
+    local report = computeReport(snapshot, force)
+
+    storage.verification_last_report = {
+        elapsed_seconds = report.elapsed_seconds,
+        tick = report.tick,
+        matched_count = #report.matched,
+        diverged = report.diverged,
+        untracked_count = #report.untracked
+    }
+
+    -- Alert if significant divergences found
+    local significant = countSignificantDivergences(report)
+    if significant > 0 then
+        game.print(string.format("[FI Verify] Tracking drift detected: %d item(s) diverged >%d%%. Use /fi-verify-report for details.",
+            significant, DIVERGENCE_THRESHOLD_PCT * 100))
+    end
+
+    -- Take new snapshot for next cycle
+    storage.verification_snapshot = {
+        tick = game.tick,
+        items = report.current_stats.items,
+        fluids = report.current_stats.fluids
+    }
+end
+
+-- Print the stored report to a player. Called by /fi-verify-report.
+local function formatReport(player)
+    if not isEnabled() then
+        player.print("[FI Verify] Verification is disabled. Enable it in mod settings.")
+        return
+    end
+
+    local report = storage.verification_last_report
+    if not report then
+        player.print("[FI Verify] No report available yet. Background checks run every 3 minutes.")
+        return
+    end
+
+    local total_active = report.matched_count + #report.diverged + report.untracked_count
+
+    player.print(string.format("[FI Verify] Report from %.0f seconds ago (%.0f second window):",
+        (game.tick - report.tick) / 60, report.elapsed_seconds))
     player.print(string.format("[FI Verify] %d items active, %d matched (<5%%), %d diverged, %d untracked",
-        total_active, #matched, #diverged, #untracked))
+        total_active, report.matched_count, #report.diverged, report.untracked_count))
 
-    if #diverged > 0 then
-        local showing = math.min(#diverged, max_diverged_shown)
-        if showing < #diverged then
-            player.print(string.format("[FI Verify] Top %d diverged (of %d):", showing, #diverged))
+    if #report.diverged > 0 then
+        local showing = math.min(#report.diverged, MAX_DIVERGED_SHOWN)
+        if showing < #report.diverged then
+            player.print(string.format("[FI Verify] Top %d diverged (of %d):", showing, #report.diverged))
         else
             player.print("[FI Verify] Diverged (possible bugs):")
         end
         for i = 1, showing do
-            local d = diverged[i]
+            local d = report.diverged[i]
             local parts = {}
             local prod_diff = math.abs(d.game.produced - d.mod.produced)
             local prod_pct = d.game.produced > 0 and string.format("%.0f%%", prod_diff / d.game.produced * 100) or "N/A"
@@ -218,32 +289,43 @@ local function compareAndReport(player)
 
             player.print("  " .. d.item .. ": " .. table.concat(parts, " | "))
         end
-        if showing < #diverged then
-            player.print(string.format("  ... and %d more minor divergences omitted", #diverged - showing))
+        if showing < #report.diverged then
+            player.print(string.format("  ... and %d more minor divergences omitted", #report.diverged - showing))
         end
     end
 
-    if #untracked > 0 then
-        player.print(string.format("[FI Verify] %d untracked items (not tracked by mod, expected for hand-crafting, logistics, etc.)", #untracked))
+    if report.untracked_count > 0 then
+        player.print(string.format("[FI Verify] %d untracked items (not tracked by mod, expected for hand-crafting, logistics, etc.)", report.untracked_count))
     end
-
-    storage.verification_snapshot = nil
 end
 
-local function reportStatus(player)
-    local snapshot = storage.verification_snapshot
-    if not snapshot then
-        player.print("[FI Verify] No active snapshot.")
-        return
-    end
+-- Handle the mod setting being toggled. When enabled, take an initial snapshot immediately.
+local function onSettingChanged(event)
+    if event.setting ~= SETTING_NAME then return end
 
-    local elapsed_ticks = game.tick - snapshot.tick
-    local elapsed_seconds = elapsed_ticks / 60
-    player.print(string.format("[FI Verify] Active snapshot from tick %d (%.0f seconds ago).", snapshot.tick, elapsed_seconds))
+    if isEnabled() then
+        local force = game.forces["player"]
+        if not force then return end
+
+        results.flushBuffers()
+        local stats = collectStats(force)
+        storage.verification_snapshot = {
+            tick = game.tick,
+            items = stats.items,
+            fluids = stats.fluids
+        }
+        storage.verification_last_report = nil
+        game.print("[FI Verify] Verification enabled. First report will be available in 3 minutes.")
+    else
+        storage.verification_snapshot = nil
+        storage.verification_last_report = nil
+        game.print("[FI Verify] Verification disabled.")
+    end
 end
 
 return {
-    takeSnapshot = takeSnapshot,
-    compareAndReport = compareAndReport,
-    reportStatus = reportStatus
+    CHECK_INTERVAL = CHECK_INTERVAL,
+    runBackgroundCheck = runBackgroundCheck,
+    formatReport = formatReport,
+    onSettingChanged = onSettingChanged
 }
