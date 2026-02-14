@@ -29,8 +29,9 @@ local function updateProductionAndConsumptionStatsAM()
             for i, producer in ipairs(storage.producers[unit_number]) do
                 results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount, surface_index, production_quality or producer.quality)
             end
+            local consumption_diff = diff / (1 + data.entity.productivity_bonus)
             for j, consumer in ipairs(storage.consumers[unit_number]) do
-                results.addConsumptionData(consumer.item, consumer.recipe, diff, diff*consumer.amount, surface_index, consumer.quality)
+                results.addConsumptionData(consumer.item, consumer.recipe, consumption_diff, consumption_diff*consumer.amount, surface_index, consumer.quality)
             end
         end
 
@@ -59,8 +60,9 @@ local function updateProductionAndConsumptionStatsFurnace()
             for i, producer in ipairs(storage.producers[unit_number]) do
                 results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount, surface_index, production_quality or producer.quality)
             end
+            local consumption_diff = diff / (1 + data.entity.productivity_bonus)
             for j, consumer in ipairs(storage.consumers[unit_number]) do
-                results.addConsumptionData(consumer.item, consumer.recipe, diff, diff*consumer.amount, surface_index, consumer.quality)
+                results.addConsumptionData(consumer.item, consumer.recipe, consumption_diff, consumption_diff*consumer.amount, surface_index, consumer.quality)
             end
         end
         if not data.entity.valid then
@@ -83,8 +85,13 @@ local function updateProductionAndConsumptionStatsMD()
             if data.entity.valid and data.previous_progress and data.entity.mining_progress and data.entity.mining_progress < data.previous_progress then
                 local surface_index = data.entity.surface_index
                 local productivity_multiplier = 1 + data.entity.productivity_bonus
+                local mining_target = data.entity.mining_target
+                local yield_multiplier = 1
+                if mining_target and mining_target.valid and mining_target.prototype.infinite_resource then
+                    yield_multiplier = mining_target.amount / mining_target.prototype.normal_resource_amount
+                end
                 for i, producer in ipairs(storage.producers[unit_number]) do
-                    results.addProductionData(producer.item, producer.recipe, 1, producer.amount * productivity_multiplier, surface_index, producer.quality)
+                    results.addProductionData(producer.item, producer.recipe, 1, producer.amount * productivity_multiplier * yield_multiplier, surface_index, producer.quality)
                 end
                 for j, consumer in ipairs(storage.consumers[unit_number]) do
                     results.addConsumptionData(consumer.item, consumer.recipe, 1, consumer.amount, surface_index, consumer.quality)

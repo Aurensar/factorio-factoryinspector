@@ -1,7 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.10
+Date: 2026-02-14
+  Bugfixes:
+    - Fixed consumption over-reporting for assembling machines and furnaces with productivity bonuses — bonus crafts from productivity don't consume inputs, so consumption is now divided by (1 + productivity_bonus)
+---------------------------------------------------------------------------------------------------
 Version: 2.1.9
-Date: ????
-  Changes:
+Date: 2026-02-14
+  Bugfixes:
+    - Fixed infinite resource mining (crude oil, etc.) massively over-reporting production by not accounting for yield decay — output is now scaled by the resource's current yield factor
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.8
 Date: 2026-02-14
