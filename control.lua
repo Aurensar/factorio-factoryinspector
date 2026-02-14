@@ -40,12 +40,6 @@ script.on_event(defines.events.on_gui_closed, event_handlers.onGuiClosed)
 script.on_event(defines.events.on_runtime_mod_setting_changed, event_handlers.onRuntimeModSettingChanged)
 
 local verification = require "script.verification"
-commands.add_command("fi-verify-report", "Show the latest background verification report", function(command)
-    local player = game.get_player(command.player_index)
-    if player then verification.formatReport(player) end
-end)
-commands.add_command("fi-verify-now", "Force an immediate verification check", function(command)
+commands.add_command("fi-verify-now", "Force an immediate verification check and print results", function(command)
     verification.runBackgroundCheck()
-    local player = game.get_player(command.player_index)
-    if player then verification.formatReport(player) end
 end)

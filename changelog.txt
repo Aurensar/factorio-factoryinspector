@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.6
+Date: 2026-02-14
+  Changes:
+    - Verification report now prints automatically to console when each background cycle completes
+    - Removed /fi-verify-report command (no longer needed since reports print automatically)
+    - /fi-verify-now still available to force an immediate check
+---------------------------------------------------------------------------------------------------
 Version: 2.1.5
 Date: 2026-02-13
   Features:

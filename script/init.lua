@@ -30,7 +30,6 @@ local function init()
 
     -- Reset verification state
     storage.verification_snapshot = nil
-    storage.verification_last_report = nil
 
     -- Load standard partition configuration
     -- TODO make partitioning/performance management configurable

@@ -2,8 +2,6 @@ local results = require "script.results"
 
 local SETTING_NAME = "factory-inspector-enable-verification"
 local CHECK_INTERVAL = 10800 -- 3 minutes in ticks
-local DIVERGENCE_THRESHOLD_PCT = 0.20 -- 20%
-local DIVERGENCE_THRESHOLD_ABS = 50
 local MAX_DIVERGED_SHOWN = 10
 
 local function isEnabled()
@@ -184,21 +182,42 @@ local function computeReport(snapshot, force)
     }
 end
 
--- Count items with significant divergence (for background alerting)
-local function countSignificantDivergences(report)
-    local count = 0
-    for _, d in ipairs(report.diverged) do
-        local prod_diff = math.abs(d.game.produced - d.mod.produced)
-        local cons_diff = math.abs(d.game.consumed - d.mod.consumed)
-        local prod_pct = d.game.produced > 0 and (prod_diff / d.game.produced) or 0
-        local cons_pct = d.game.consumed > 0 and (cons_diff / d.game.consumed) or 0
+-- Print a full verification report to the game console.
+local function printReport(report)
+    local total_active = #report.matched + #report.diverged + #report.untracked
 
-        if (prod_diff > DIVERGENCE_THRESHOLD_ABS and prod_pct > DIVERGENCE_THRESHOLD_PCT)
-            or (cons_diff > DIVERGENCE_THRESHOLD_ABS and cons_pct > DIVERGENCE_THRESHOLD_PCT) then
-            count = count + 1
+    game.print(string.format("[FI Verify] Report (%.0f second window):", report.elapsed_seconds))
+    game.print(string.format("[FI Verify] %d items active, %d matched (<5%%), %d diverged, %d untracked",
+        total_active, #report.matched, #report.diverged, #report.untracked))
+
+    if #report.diverged > 0 then
+        local showing = math.min(#report.diverged, MAX_DIVERGED_SHOWN)
+        if showing < #report.diverged then
+            game.print(string.format("[FI Verify] Top %d diverged (of %d):", showing, #report.diverged))
+        else
+            game.print("[FI Verify] Diverged (possible bugs):")
+        end
+        for i = 1, showing do
+            local d = report.diverged[i]
+            local parts = {}
+            local prod_diff = math.abs(d.game.produced - d.mod.produced)
+            local prod_pct = d.game.produced > 0 and string.format("%.0f%%", prod_diff / d.game.produced * 100) or "N/A"
+            table.insert(parts, string.format("PROD game=%.0f mod=%.0f diff=%.0f (%s)", d.game.produced, d.mod.produced, prod_diff, prod_pct))
+
+            local cons_diff = math.abs(d.game.consumed - d.mod.consumed)
+            local cons_pct = d.game.consumed > 0 and string.format("%.0f%%", cons_diff / d.game.consumed * 100) or "N/A"
+            table.insert(parts, string.format("CONS game=%.0f mod=%.0f diff=%.0f (%s)", d.game.consumed, d.mod.consumed, cons_diff, cons_pct))
+
+            game.print("  " .. d.item .. ": " .. table.concat(parts, " | "))
+        end
+        if showing < #report.diverged then
+            game.print(string.format("  ... and %d more minor divergences omitted", #report.diverged - showing))
         end
     end
-    return count
+
+    if #report.untracked > 0 then
+        game.print(string.format("[FI Verify] %d untracked items (not tracked by mod, expected for hand-crafting, logistics, etc.)", #report.untracked))
+    end
 end
 
 -- Run one background verification cycle. Called from onGameTick every CHECK_INTERVAL ticks.
@@ -223,23 +242,9 @@ local function runBackgroundCheck()
         return
     end
 
-    -- Subsequent cycles: compare and store report, then take new snapshot
+    -- Subsequent cycles: compute report, print it, then take new snapshot
     local report = computeReport(snapshot, force)
-
-    storage.verification_last_report = {
-        elapsed_seconds = report.elapsed_seconds,
-        tick = report.tick,
-        matched_count = #report.matched,
-        diverged = report.diverged,
-        untracked_count = #report.untracked
-    }
-
-    -- Alert if significant divergences found
-    local significant = countSignificantDivergences(report)
-    if significant > 0 then
-        game.print(string.format("[FI Verify] Tracking drift detected: %d item(s) diverged >%d%%. Use /fi-verify-report for details.",
-            significant, DIVERGENCE_THRESHOLD_PCT * 100))
-    end
+    printReport(report)
 
     -- Take new snapshot for next cycle
     storage.verification_snapshot = {
@@ -247,56 +252,6 @@ local function runBackgroundCheck()
         items = report.current_stats.items,
         fluids = report.current_stats.fluids
     }
-end
-
--- Print the stored report to a player. Called by /fi-verify-report.
-local function formatReport(player)
-    if not isEnabled() then
-        player.print("[FI Verify] Verification is disabled. Enable it in mod settings.")
-        return
-    end
-
-    local report = storage.verification_last_report
-    if not report then
-        player.print("[FI Verify] No report available yet. Background checks run every 3 minutes.")
-        return
-    end
-
-    local total_active = report.matched_count + #report.diverged + report.untracked_count
-
-    player.print(string.format("[FI Verify] Report from %.0f seconds ago (%.0f second window):",
-        (game.tick - report.tick) / 60, report.elapsed_seconds))
-    player.print(string.format("[FI Verify] %d items active, %d matched (<5%%), %d diverged, %d untracked",
-        total_active, report.matched_count, #report.diverged, report.untracked_count))
-
-    if #report.diverged > 0 then
-        local showing = math.min(#report.diverged, MAX_DIVERGED_SHOWN)
-        if showing < #report.diverged then
-            player.print(string.format("[FI Verify] Top %d diverged (of %d):", showing, #report.diverged))
-        else
-            player.print("[FI Verify] Diverged (possible bugs):")
-        end
-        for i = 1, showing do
-            local d = report.diverged[i]
-            local parts = {}
-            local prod_diff = math.abs(d.game.produced - d.mod.produced)
-            local prod_pct = d.game.produced > 0 and string.format("%.0f%%", prod_diff / d.game.produced * 100) or "N/A"
-            table.insert(parts, string.format("PROD game=%.0f mod=%.0f diff=%.0f (%s)", d.game.produced, d.mod.produced, prod_diff, prod_pct))
-
-            local cons_diff = math.abs(d.game.consumed - d.mod.consumed)
-            local cons_pct = d.game.consumed > 0 and string.format("%.0f%%", cons_diff / d.game.consumed * 100) or "N/A"
-            table.insert(parts, string.format("CONS game=%.0f mod=%.0f diff=%.0f (%s)", d.game.consumed, d.mod.consumed, cons_diff, cons_pct))
-
-            player.print("  " .. d.item .. ": " .. table.concat(parts, " | "))
-        end
-        if showing < #report.diverged then
-            player.print(string.format("  ... and %d more minor divergences omitted", #report.diverged - showing))
-        end
-    end
-
-    if report.untracked_count > 0 then
-        player.print(string.format("[FI Verify] %d untracked items (not tracked by mod, expected for hand-crafting, logistics, etc.)", report.untracked_count))
-    end
 end
 
 -- Handle the mod setting being toggled. When enabled, take an initial snapshot immediately.
@@ -314,11 +269,9 @@ local function onSettingChanged(event)
             items = stats.items,
             fluids = stats.fluids
         }
-        storage.verification_last_report = nil
-        game.print("[FI Verify] Verification enabled. First report will be available in 3 minutes.")
+        game.print("[FI Verify] Verification enabled. First report will print in 3 minutes.")
     else
         storage.verification_snapshot = nil
-        storage.verification_last_report = nil
         game.print("[FI Verify] Verification disabled.")
     end
 end
@@ -326,6 +279,5 @@ end
 return {
     CHECK_INTERVAL = CHECK_INTERVAL,
     runBackgroundCheck = runBackgroundCheck,
-    formatReport = formatReport,
     onSettingChanged = onSettingChanged
 }
