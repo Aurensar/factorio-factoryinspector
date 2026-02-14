@@ -32,11 +32,9 @@ local function onGameTick(event)
         Assembling machine and furnace results recording (medium batch size) - 
             AMs have products_finished so it doesn't matter if we "miss" a craft, but if it takes 10s+ to analyse the entire factory, the mod loses accuracy and becomes less useful.
 
-        Mining drills results recording (large batch size)
-            Mining drills don't have products_finished so mining drills that cycle very fast will cause the mod to "miss" crafts
-            We really need to get through all of the base's mining drills every second (60 ticks)
-            It's likely that even this won't be enough for modded games or games with very fast mining speed. 
-            To be clear: the mod will not accurately track produced or consumed resources from mining drills if the mining cycle time is less than 0.5 seconds.
+        Mining drills results recording (all partitions every tick)
+            Mining drills don't have products_finished, only mining_progress (0→1 range that resets).
+            To avoid missing cycles on fast drills, all mining drill partitions are processed every tick.
 
         To add a final layer of difficulty, the mod also needs to periodically check for new entities being added that did not fire an onBuiltEntity event.
         This typically happens when other mods create entities via script.

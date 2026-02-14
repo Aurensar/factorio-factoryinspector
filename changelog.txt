@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.8
+Date: 2026-02-14
+  Bugfixes:
+    - Fixed mining drill production tracking not accounting for mining productivity bonuses (from research, modules, etc.) — amounts are now multiplied by (1 + productivity_bonus) at tracking time
+---------------------------------------------------------------------------------------------------
+Version: 2.1.7
+Date: 2026-02-14
+  Bugfixes:
+    - Fixed mining drill production tracking losing ~70% of output for fast drills: now checks all mining drill partitions every tick instead of cycling one partition per tick
+---------------------------------------------------------------------------------------------------
 Version: 2.1.6
 Date: 2026-02-14
   Changes:

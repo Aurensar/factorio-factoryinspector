@@ -3,11 +3,9 @@ local results = require "script.results"
 
 local current_am_partition = 1
 local current_furnace_partition = 1
-local current_md_partition = 1
 
 local am_start_tick = 1
 local furnace_start_tick = 1
-local md_start_tick = 1
 
 local function updateResults(item, recipe, amount, seconds, diff)
     storage.results[item].consumed[recipe].times = storage.results[item].consumed[recipe].times + diff
@@ -80,23 +78,20 @@ local function updateProductionAndConsumptionStatsFurnace()
 end
 
 local function updateProductionAndConsumptionStatsMD()
-    for unit_number, data in pairs(storage.entities_md[current_md_partition]) do
-        if data.entity.valid and data.previous_progress and data.entity.mining_progress and data.entity.mining_progress < data.previous_progress then
-            local surface_index = data.entity.surface_index
-            for i, producer in ipairs(storage.producers[unit_number]) do
-                results.addProductionData(producer.item, producer.recipe, 1, producer.amount, surface_index, producer.quality)
+    for partition = 1, storage.md_partition_data.current do
+        for unit_number, data in pairs(storage.entities_md[partition]) do
+            if data.entity.valid and data.previous_progress and data.entity.mining_progress and data.entity.mining_progress < data.previous_progress then
+                local surface_index = data.entity.surface_index
+                local productivity_multiplier = 1 + data.entity.productivity_bonus
+                for i, producer in ipairs(storage.producers[unit_number]) do
+                    results.addProductionData(producer.item, producer.recipe, 1, producer.amount * productivity_multiplier, surface_index, producer.quality)
+                end
+                for j, consumer in ipairs(storage.consumers[unit_number]) do
+                    results.addConsumptionData(consumer.item, consumer.recipe, 1, consumer.amount, surface_index, consumer.quality)
+                end
             end
-            for j, consumer in ipairs(storage.consumers[unit_number]) do
-                results.addConsumptionData(consumer.item, consumer.recipe, 1, consumer.amount, surface_index, consumer.quality)
-            end
+            if data.entity.valid then data.previous_progress = data.entity.mining_progress end
         end
-        if data.entity.valid then data.previous_progress = data.entity.mining_progress end
-    end
-
-    current_md_partition = current_md_partition + 1
-    if current_md_partition > storage.md_partition_data.current then
-        current_md_partition = 1
-        md_start_tick = game.tick
     end
 end
 
