@@ -3,6 +3,12 @@ local logger = require "script.logger"
 
 productionTables = {}
 
+local function addPercentBar(parent, fraction)
+    local pct_flow = parent.add { type = "flow", direction = "horizontal", style = "fi_table_percent_flow" }
+    pct_flow.add { type = "progressbar", value = fraction, style = "fi_table_percent_bar" }
+    pct_flow.add { type = "label", caption = string.format("%d%%", fraction * 100), style = "fi_table_percent_label" }
+end
+
 function productionTables.create(player)
     local ui_state = ui.ui_state(player)
 
@@ -128,7 +134,7 @@ function productionTables.refreshConsumption(player)
             table.add { type = "label", caption = string.format("%d", entry.amount), style="fi_table_number" }
             table.add { type = "label", caption = string.format("%.1f", entry.per_sec), style="fi_table_number" }
             table.add { type = "label", caption = string.format("%d", entry.per_min), style="fi_table_number" }
-            table.add { type = "label", caption = string.format("%d", (entry.amount / agg.total.amount * 100)), style="fi_table_number" }
+            addPercentBar(table, entry.amount / agg.total.amount)
         end
     end
 
@@ -141,7 +147,7 @@ function productionTables.refreshConsumption(player)
     table.add { type = "label", caption = string.format("%d", agg.total.amount), style="fi_table_number_heading"}
     table.add { type = "label", caption = string.format("%.1f", agg.total.per_sec), style="fi_table_number_heading" }
     table.add { type = "label", caption = string.format("%d", agg.total.per_min), style="fi_table_number_heading" }
-    table.add { type = "label", caption = string.format("%d", 100), style="fi_table_number_heading" }
+    addPercentBar(table, 1.0)
 end
 
 function productionTables.refreshProduction(player)
@@ -182,7 +188,7 @@ function productionTables.refreshProduction(player)
             table.add { type = "label", caption = string.format("%d", entry.amount), style="fi_table_number" }
             table.add { type = "label", caption = string.format("%.1f", entry.per_sec), style="fi_table_number" }
             table.add { type = "label", caption = string.format("%d", entry.per_min), style="fi_table_number" }
-            table.add { type = "label", caption = string.format("%d", (entry.amount / agg.total.amount * 100)), style="fi_table_number" }
+            addPercentBar(table, entry.amount / agg.total.amount)
         end
     end
 
@@ -195,5 +201,5 @@ function productionTables.refreshProduction(player)
     table.add { type = "label", caption = string.format("%d", agg.total.amount), style="fi_table_number_heading"}
     table.add { type = "label", caption = string.format("%.1f", agg.total.per_sec), style="fi_table_number_heading" }
     table.add { type = "label", caption = string.format("%d", agg.total.per_min), style="fi_table_number_heading" }
-    table.add { type = "label", caption = string.format("%d", 100), style="fi_table_number_heading" }
+    addPercentBar(table, 1.0)
 end

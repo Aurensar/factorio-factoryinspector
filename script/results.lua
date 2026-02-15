@@ -36,6 +36,7 @@ local function getAggregateConsumption(item, timePeriodInSeconds)
     if total.amount == 0 then return nil end
     total.per_sec = total.amount / timePeriodInSeconds
     total.per_min = total.per_sec * 60
+    table.sort(entries, function(a, b) return a.amount > b.amount end)
 
     return { entries = entries, total = total }
 end
@@ -73,6 +74,7 @@ local function getAggregateProduction(item, timePeriodInSeconds)
     if total.amount == 0 then return nil end
     total.per_sec = total.amount / timePeriodInSeconds
     total.per_min = total.per_sec * 60
+    table.sort(entries, function(a, b) return a.amount > b.amount end)
 
     return { entries = entries, total = total }
 end

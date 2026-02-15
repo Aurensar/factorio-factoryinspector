@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.14
+Date: 2026-02-15
+  Features:
+    - Sort production and consumption table rows by amount descending (highest percentage first)
+---------------------------------------------------------------------------------------------------
+Version: 2.1.13
+Date: 2026-02-15
+  Features:
+    - Replace percentage column in production/consumption tables with a horizontal bar chart and percentage label
+---------------------------------------------------------------------------------------------------
 Version: 2.1.12
 Date: 2026-02-15
   Features:

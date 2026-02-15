@@ -114,3 +114,23 @@ styles["fi_table_quality"] = {
     width = 100,
     maximal_width = 100
 }
+
+styles["fi_table_percent_flow"] = {
+    type = "horizontal_flow_style",
+    width = 120,
+    vertical_align = "center",
+    horizontal_spacing = 4
+}
+
+styles["fi_table_percent_bar"] = {
+    type = "progressbar_style",
+    width = 80,
+    height = 12,
+    color = {r = 0.3, g = 0.7, b = 0.3}
+}
+
+styles["fi_table_percent_label"] = {
+    type = "label_style",
+    width = 34,
+    horizontal_align = "right"
+}
