@@ -55,6 +55,21 @@ local function getQualityDisplayName(quality_name)
     return quality_name
 end
 
+local function addSpriteWithQuality(table, sprite, quality)
+    if quality and quality ~= "normal" then
+        local icon_flow = table.add { type = "flow", direction = "horizontal" }
+        icon_flow.style.width = 30
+        icon_flow.style.height = 30
+        local rs = icon_flow.add { type = "sprite", sprite = sprite }
+        rs.style.size = {28, 28}
+        local qs = icon_flow.add { type = "sprite", sprite = "quality/" .. quality }
+        qs.style.size = {14, 14}
+        qs.style.margin = {14, 0, 0, -14}
+    else
+        table.add { type = "sprite", sprite = sprite }
+    end
+end
+
 local function getDisplayNameAndSpriteForDynamicRecipe(dynamicRecipe)
     if not storage.fakeRecipeLookup[dynamicRecipe] then
         logger.error("Lookup system can't find a match for dynamic recipe "..dynamicRecipe..", please report a bug")
@@ -104,10 +119,7 @@ function productionTables.refreshConsumption(player)
             local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(entry.recipe)
             local surface_name = getSurfaceDisplayName(entry.surface_index)
             local quality_name = getQualityDisplayName(entry.quality or "normal")
-            if entry.quality and entry.quality ~= "normal" then
-                sprite = "quality/" .. entry.quality
-            end
-            table.add { type = "sprite", sprite = sprite }
+            addSpriteWithQuality(table, sprite, entry.quality)
             table.add { type = "label", caption = name, style="fi_table_text" }
             table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
             table.add { type = "label", caption = surface_name, style="fi_table_surface" }
@@ -161,10 +173,7 @@ function productionTables.refreshProduction(player)
             local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(entry.recipe)
             local surface_name = getSurfaceDisplayName(entry.surface_index)
             local quality_name = getQualityDisplayName(entry.quality or "normal")
-            if entry.quality and entry.quality ~= "normal" then
-                sprite = "quality/" .. entry.quality
-            end
-            table.add { type = "sprite", sprite = sprite }
+            addSpriteWithQuality(table, sprite, entry.quality)
             table.add { type = "label", caption = name, style="fi_table_text" }
             table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
             table.add { type = "label", caption = surface_name, style="fi_table_surface" }

@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.12
+Date: 2026-02-15
+  Features:
+    - Overlay quality dots on the recipe icon for non-normal quality rows, matching in-game quality display
+---------------------------------------------------------------------------------------------------
 Version: 2.1.11
 Date: 2026-02-15
   Features:
