@@ -104,6 +104,9 @@ function productionTables.refreshConsumption(player)
             local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(entry.recipe)
             local surface_name = getSurfaceDisplayName(entry.surface_index)
             local quality_name = getQualityDisplayName(entry.quality or "normal")
+            if entry.quality and entry.quality ~= "normal" then
+                sprite = "quality/" .. entry.quality
+            end
             table.add { type = "sprite", sprite = sprite }
             table.add { type = "label", caption = name, style="fi_table_text" }
             table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
@@ -158,6 +161,9 @@ function productionTables.refreshProduction(player)
             local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(entry.recipe)
             local surface_name = getSurfaceDisplayName(entry.surface_index)
             local quality_name = getQualityDisplayName(entry.quality or "normal")
+            if entry.quality and entry.quality ~= "normal" then
+                sprite = "quality/" .. entry.quality
+            end
             table.add { type = "sprite", sprite = sprite }
             table.add { type = "label", caption = name, style="fi_table_text" }
             table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
