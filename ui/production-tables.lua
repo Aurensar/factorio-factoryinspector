@@ -22,7 +22,7 @@ function productionTables.create(player)
     ui_state.prod_table_holder.style.vertically_stretchable = true
     ui_state.prod_table_holder.style.padding = { 10,10 }
 
-    ui_state.prod_table = ui_state.prod_table_holder.add { type = "table", column_count = 10, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
+    ui_state.prod_table = ui_state.prod_table_holder.add { type = "table", column_count = 9, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
     ui_state.prod_table.style.horizontal_spacing = 16
 
     ui_state.right_column.add{type="label", caption={"ui.consumption-stats"}, style="caption_label", ignored_by_interaction=true}
@@ -35,7 +35,7 @@ function productionTables.create(player)
     ui_state.cons_table_holder.style.vertically_stretchable = true
     ui_state.cons_table_holder.style.padding = { 10,10 }
 
-    ui_state.cons_table = ui_state.cons_table_holder.add { type = "table", column_count = 10, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
+    ui_state.cons_table = ui_state.cons_table_holder.add { type = "table", column_count = 9, vertical_centering=false, style="fi_table_production", draw_vertical_lines=true, draw_horizontal_lines=true }
     ui_state.cons_table.style.horizontal_spacing = 16
 
     productionTables.refreshConsumption(player)
@@ -108,7 +108,6 @@ function productionTables.refreshConsumption(player)
 
     table.add { type = "label", caption = "", style="fi_table_sprite_heading" } -- for the sprite
     table.add { type = "label", caption = {"ui.recipe-name"}, style="fi_table_text_heading" }
-    table.add { type = "label", caption = {"ui.recipe-name-internal"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.surface"}, style="fi_table_surface_heading" }
     table.add { type = "label", caption = {"ui.quality"}, style="fi_table_quality_heading" }
     table.add { type = "label", caption = {"ui.times-consumed"}, style="fi_table_number_heading" }
@@ -123,11 +122,11 @@ function productionTables.refreshConsumption(player)
     for _, entry in ipairs(agg.entries) do
         if entry.times > 0 then
             local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(entry.recipe)
+            local combined_name = {"", name, " (", entry.recipe, ")"}
             local surface_name = getSurfaceDisplayName(entry.surface_index)
             local quality_name = getQualityDisplayName(entry.quality or "normal")
             addSpriteWithQuality(table, sprite, entry.quality)
-            table.add { type = "label", caption = name, style="fi_table_text" }
-            table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
+            table.add { type = "label", caption = combined_name, style="fi_table_text" }
             table.add { type = "label", caption = surface_name, style="fi_table_surface" }
             table.add { type = "label", caption = quality_name, style="fi_table_quality" }
             table.add { type = "label", caption = string.format("%d", entry.times), style="fi_table_number" }
@@ -139,7 +138,6 @@ function productionTables.refreshConsumption(player)
     end
 
     table.add { type = "sprite", sprite = ""}
-    table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = "", style="fi_table_surface_heading" }
     table.add { type = "label", caption = "", style="fi_table_quality_heading" }
@@ -162,7 +160,6 @@ function productionTables.refreshProduction(player)
 
     table.add { type = "label", caption = "", style="fi_table_sprite_heading" } -- for the sprite
     table.add { type = "label", caption = {"ui.recipe-name"}, style="fi_table_text_heading" }
-    table.add { type = "label", caption = {"ui.recipe-name-internal"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.surface"}, style="fi_table_surface_heading" }
     table.add { type = "label", caption = {"ui.quality"}, style="fi_table_quality_heading" }
     table.add { type = "label", caption = {"ui.times-produced"}, style="fi_table_number_heading" }
@@ -177,11 +174,11 @@ function productionTables.refreshProduction(player)
     for _, entry in ipairs(agg.entries) do
         if entry.times > 0 then
             local name, sprite = getDisplayNameAndSpriteForDynamicRecipe(entry.recipe)
+            local combined_name = {"", name, " (", entry.recipe, ")"}
             local surface_name = getSurfaceDisplayName(entry.surface_index)
             local quality_name = getQualityDisplayName(entry.quality or "normal")
             addSpriteWithQuality(table, sprite, entry.quality)
-            table.add { type = "label", caption = name, style="fi_table_text" }
-            table.add { type = "label", caption = entry.recipe, style="fi_table_text" }
+            table.add { type = "label", caption = combined_name, style="fi_table_text" }
             table.add { type = "label", caption = surface_name, style="fi_table_surface" }
             table.add { type = "label", caption = quality_name, style="fi_table_quality" }
             table.add { type = "label", caption = string.format("%d", entry.times), style="fi_table_number" }
@@ -193,7 +190,6 @@ function productionTables.refreshProduction(player)
     end
 
     table.add { type = "sprite", sprite = ""}
-    table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = {"ui.total"}, style="fi_table_text_heading" }
     table.add { type = "label", caption = "", style="fi_table_surface_heading" }
     table.add { type = "label", caption = "", style="fi_table_quality_heading" }
