@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.18
+Date: 2026-02-15
+  Features:
+    - Show "No production/consumption in last X seconds" message when tables have no data
+---------------------------------------------------------------------------------------------------
+Version: 2.1.17
+Date: 2026-02-15
+  Features:
+    - Add "Display time window" setting to configure how many seconds of data are aggregated (default: 120, range: 10-300)
+    - Production/consumption table headers now show the current time window
+---------------------------------------------------------------------------------------------------
 Version: 2.1.16
 Date: ????
   Changes:
