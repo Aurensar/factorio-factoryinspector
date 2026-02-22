@@ -3,6 +3,7 @@ local entity_tracker = require "script.entity-tracker"
 local production_tracker = require "script.production-tracker"
 local results = require "script.results"
 local verification = require "script.verification"
+local input_output_calculator = require "script.input-output-calculator"
 
 local function onBuiltEntity(event)
     local entity = event.entity
@@ -10,11 +11,35 @@ local function onBuiltEntity(event)
     if entity and entity.valid then
       logger.log("Entity created: "..entity.unit_number)
       entity_tracker.enrolNewEntity(entity)
+      if entity.type == "lab" then
+          input_output_calculator.buildForceLabCache(entity.force)
+      end
     end
 end
 
 local function onRemovedEntity(event)
-    entity_tracker.removeEntity(event.entity)
+    local entity = event.entity
+    if not entity then return end
+    local unit_number = entity.unit_number
+    local is_lab = entity.type == "lab"
+    local lab_force = is_lab and entity.valid and entity.force or nil
+    if unit_number then
+        entity_tracker.removeEntityByNumber(unit_number)
+    end
+    if is_lab and lab_force and lab_force.valid then
+        input_output_calculator.buildForceLabCache(lab_force)
+    end
+end
+
+local function onResearchStarted(event)
+    local tech = event.research
+    local force = tech.force
+    input_output_calculator.addResearchFakeRecipeLookup(tech)
+    storage.force_research_state[force.index] = {
+        tech_name = tech.name,
+        previous_progress = force.research_progress
+    }
+    input_output_calculator.buildForceLabCache(force)
 end
 
 local function onGameTick(event)
@@ -48,13 +73,20 @@ local function onGameTick(event)
     production_tracker.updateProductionAndConsumptionStatsAM()
     production_tracker.updateProductionAndConsumptionStatsFurnace()
     production_tracker.updateProductionAndConsumptionStatsMD()
+    production_tracker.updateResearchConsumption()
 
     if game.tick % 60 == 0 then
         for playerIndex, data in pairs(storage.players) do
-            if data.ui and data.ui.mainFrame and data.ui.mainFrame.visible then
-                local player = game.get_player(playerIndex)
-                productionTables.refresh(player)
-                itemList.refresh(player)
+            if data.ui and data.ui.mainFrame then
+                if not data.ui.mainFrame.valid then
+                    data.ui.mainFrame = nil
+                elseif data.ui.mainFrame.visible then
+                    local player = game.get_player(playerIndex)
+                    if player then
+                        productionTables.refresh(player)
+                        itemList.refresh(player)
+                    end
+                end
             end
         end
     end
@@ -98,10 +130,10 @@ local function onGuiTextChanged(event)
         logger.log2(string.format("DEBUG ENTITY %d Found entity in partition %d",number, partition))
         logger.log2(string.format("DEBUG ENTITY %d Recipe is %s",number, entity.recipe))
 
-        for i, consumer in ipairs(storage.consumers[number]) do
+        for i, consumer in ipairs(storage.consumers[number] or {}) do
             logger.log2(string.format("DEBUG ENTITY %d Consumes %d: item=%s amount=%.1f recipe=%s quality=%s",number, i, consumer.item, consumer.amount, consumer.recipe, consumer.quality or "normal"))
         end
-        for i, producer in ipairs(storage.producers[number]) do
+        for i, producer in ipairs(storage.producers[number] or {}) do
             logger.log2(string.format("DEBUG ENTITY %d Produces %d: item=%s amount=%.1f recipe=%s quality=%s",number, i, producer.item, producer.amount, producer.recipe, producer.quality or "normal"))
         end
         return
@@ -135,6 +167,7 @@ return {
     onGameTick = onGameTick,
     onBuiltEntity = onBuiltEntity,
     onRemovedEntity = onRemovedEntity,
+    onResearchStarted = onResearchStarted,
     onGuiClick = onGuiClick,
     onGuiTextChanged = onGuiTextChanged,
     onLuaShortcut = onLuaShortcut,

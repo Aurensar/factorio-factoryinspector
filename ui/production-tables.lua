@@ -80,7 +80,8 @@ local function addSpriteWithQuality(table, sprite, quality)
         qs.style.size = {14, 14}
         qs.style.margin = {14, 0, 0, -14}
     else
-        table.add { type = "sprite", sprite = sprite }
+        local s = table.add { type = "sprite", sprite = sprite }
+        s.style.size = {28, 28}
     end
 end
 
@@ -94,12 +95,19 @@ local function getDisplayNameAndSpriteForDynamicRecipe(dynamicRecipe)
     local prototypeName
     local sprite = "item/iron-plate"
     if lookup.prototypeType == "recipe" then
-        prototypeName = prototypes.recipe[lookup.prototype].localised_name
+        local proto = prototypes.recipe[lookup.prototype]
+        prototypeName = proto and proto.localised_name or lookup.prototype
         sprite = "recipe/"..lookup.prototype
     end
     if lookup.prototypeType == "resource" then
-        prototypeName = prototypes.entity[lookup.prototype].localised_name
+        local proto = prototypes.entity[lookup.prototype]
+        prototypeName = proto and proto.localised_name or lookup.prototype
         sprite = "entity/"..lookup.prototype
+    end
+    if lookup.prototypeType == "technology" then
+        local proto = prototypes.technology[lookup.prototype]
+        prototypeName = proto and proto.localised_name or lookup.prototype
+        sprite = "technology/"..lookup.prototype
     end
     return {lookup.formatString, prototypeName}, sprite
 end
@@ -136,6 +144,7 @@ end
 function productionTables.refreshConsumption(player)
     local ui_state = ui.ui_state(player)
     local table = ui_state.cons_table
+    if not table or not table.valid then return end
     local selected_item = ui_state.selected_item
     table.clear()
     clearEmptyLabel(ui_state, "cons_empty_label")
@@ -196,6 +205,7 @@ end
 function productionTables.refreshProduction(player)
     local ui_state = ui.ui_state(player)
     local table = ui_state.prod_table
+    if not table or not table.valid then return end
     local selected_item = ui_state.selected_item
     table.clear()
     clearEmptyLabel(ui_state, "prod_empty_label")

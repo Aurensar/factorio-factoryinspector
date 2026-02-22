@@ -1,4 +1,41 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.3
+Date: 2026-02-22
+  Bugfixes:
+    - Fixed research technology sprite rendering at full size (256x256) in the production/consumption tables; sprite is now explicitly constrained to 28x28, matching the quality-icon branch and the 30px sprite column width
+---------------------------------------------------------------------------------------------------
+Version: 2.2.2
+Date: 2026-02-22
+  Bugfixes:
+    - Fixed science pack consumption spike when switching to a technology that already has partial progress: on_research_started now seeds previous_progress from force.research_progress instead of 0, preventing the existing progress from being counted as a single-tick consumption event
+---------------------------------------------------------------------------------------------------
+Version: 2.2.1
+Date: 2026-02-22
+  Bugfixes:
+    - Fixed crash in lab cache builder: LuaEntityPrototype does not expose researching_speed in Factorio 2.0; now uses (1 + entity.speed_bonus) as effective lab speed, which correctly weights same-type labs and is a safe approximation for mixed-type lab setups in mods
+---------------------------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 2026-02-21
+  Features:
+    - Track science pack consumption by research laboratories
+    - Labs are registered in a dedicated partition (entities_lab) alongside assembling machines, furnaces, and mining drills
+    - Research consumption is attributed per-lab using a speed-weighted cache (force_lab_cache) that accounts for per-lab module bonuses and researching speed
+    - Consumption is split across surfaces proportionally to lab count per surface, supporting multi-surface Space Age play
+    - Each technology gets a fake recipe "research-{tech.name}" with a technology icon and localised name in the UI
+    - Cache rebuilds on on_research_started, lab placed, or lab removed; science packs appear in the consumption table under "Research <Tech Name>"
+---------------------------------------------------------------------------------------------------
+Version: 2.1.19
+Date: 2026-02-21
+  Bugfixes:
+    - Guard against stale/invalid GUI element references (mainFrame, cons_table, prod_table, listbox_items) after mod reloads or player reconnects
+    - Guard entity.mining_target.valid before accessing prototype chain in miners (prevents crashes when ore deposit becomes invalid)
+    - onRemovedEntity now reads unit_number directly rather than passing the entity, which may be invalid by the time script_raised_destroy fires
+    - Tick handler now guards against nil player from game.get_player and clears stale mainFrame references
+    - Fix classic Lua bug in cleanupOldResults: table.remove inside ipairs was skipping entries; now iterates in reverse
+    - Add nil guards on storage.consumers/producers before ipairs in all three production tracker update functions
+    - Add nil guard in flushBuffers lambdas to handle unexpected missing storage.results entries
+    - Add nil guards on prototype lookups in getDisplayNameAndSpriteForDynamicRecipe to handle mods being removed mid-save
+---------------------------------------------------------------------------------------------------
 Version: 2.1.18
 Date: 2026-02-15
   Features:
