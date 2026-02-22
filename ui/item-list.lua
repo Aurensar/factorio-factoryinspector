@@ -43,6 +43,7 @@ function itemList.refresh(player)
     local items = results.getOrderedItemList()
     local selected_item = ui_state.selected_item
 
+    if not ui_state.listbox_items or not ui_state.listbox_items.valid then return end
     ui_state.listbox_items.clear()
 
     for _, item in pairs(items) do

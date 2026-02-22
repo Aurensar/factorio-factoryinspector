@@ -14,12 +14,15 @@ local function init()
     storage.entities_md[1] = {}
     storage.entities_furnace = {}
     storage.entities_furnace[1] = {}
+    storage.entities_lab = {}
+    storage.entities_lab[1] = {}
 
     -- Reset the partition lookup tables
     storage.entities_partition_lookup = {}
     storage.entities_am_partition_lookup = {}
     storage.entities_md_partition_lookup = {}
     storage.entities_furnace_partition_lookup = {}
+    storage.entities_lab_partition_lookup = {}
 
     -- Reset the tracked production/consumption calculations
     storage.consumers = {}
@@ -37,6 +40,11 @@ local function init()
     storage.am_partition_data = { current = 1, size = 0, max_size = 10}
     storage.md_partition_data = { current = 1, size = 0, max_size = 20}
     storage.furnace_partition_data = { current = 1, size = 0, max_size = 10}
+    storage.lab_partition_data = { current = 1, size = 0, max_size = 10}
+
+    -- Force-level research tracking
+    storage.force_research_state = {}
+    storage.force_lab_cache = {}
 
     -- destroy old GUI
     for i, player in pairs(game.players) do

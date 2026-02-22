@@ -77,11 +77,12 @@ function fiMainFrame.toggle(player)
     local ui_state = ui.ui_state(player)
     local mainFrame = ui_state.mainFrame
 
-    if not mainFrame then
+    if not mainFrame or not mainFrame.valid then
+        ui_state.mainFrame = nil
         fiMainFrame.create(player, true)
         return
     end
-    
+
     local v = not mainFrame.visible
     mainFrame.visible = v
     player.opened = (v) and mainFrame or nil
@@ -91,7 +92,7 @@ function fiMainFrame.close(player)
     local ui_state = ui.ui_state(player)
     local mainFrame = ui_state.mainFrame
 
-    if mainFrame then
+    if mainFrame and mainFrame.valid then
         mainFrame.visible = false
         if player.opened == mainFrame then player.opened = nil end
     end

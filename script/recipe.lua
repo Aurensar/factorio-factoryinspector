@@ -1,5 +1,6 @@
 local function getRecipe(entity)
     if entity.type == "mining-drill" then return nil, "normal" end
+    if entity.type == "lab" then return nil, "normal" end
     local recipe, qualityPrototype = entity.get_recipe()
     local quality = (qualityPrototype and qualityPrototype.name) or "normal"
     if not recipe and entity.type == "furnace" and entity.previous_recipe then
@@ -11,7 +12,12 @@ end
 
 local function getRecipeName(entity)
     if entity.type == "mining-drill" then
-        if entity.mining_target then return "Mine "..entity.mining_target.prototype.name, "normal" end
+        if entity.mining_target and entity.mining_target.valid then return "Mine "..entity.mining_target.prototype.name, "normal" end
+        return "", "normal"
+    end
+    if entity.type == "lab" then
+        local tech = entity.force.current_research
+        if tech then return "research-"..tech.name, "normal" end
         return "", "normal"
     end
     local recipe, qualityPrototype = entity.get_recipe()

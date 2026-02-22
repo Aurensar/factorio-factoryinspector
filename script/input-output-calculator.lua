@@ -25,7 +25,7 @@ local function enrolConsumedRecipeIngredients(entity, recipe, quality)
 end
 
 local function enrolConsumedMiningFluid(entity)
-    if entity.type == "mining-drill" and entity.mining_target and entity.mining_target.prototype.mineable_properties.required_fluid then
+    if entity.type == "mining-drill" and entity.mining_target and entity.mining_target.valid and entity.mining_target.prototype.mineable_properties.required_fluid then
         local per_craft = entity.mining_target.prototype.mineable_properties.fluid_amount / 10
         local recipe_name = "Mining fluid for ".. entity.mining_target.prototype.name
         table.insert(storage.consumers[entity.unit_number], {entity=entity, item=entity.mining_target.prototype.mineable_properties.required_fluid, amount=per_craft, recipe=recipe_name, quality="normal"})
@@ -53,7 +53,7 @@ local function enrolConsumedSolidFuel(entity, recipe, quality)
             recipeName = recipe.name.." solid fuel"
             addFakeRecipeLookup(recipeName, recipe.name, "recipe", "recipe-display.solid-fuel")
         elseif entity.type == "mining-drill" then
-            if not entity.mining_target then return end
+            if not entity.mining_target or not entity.mining_target.valid then return end
             time_in_seconds = entity.mining_target.prototype.mineable_properties.mining_time / entity.prototype.mining_speed
             recipeName = "Mine "..entity.mining_target.prototype.name.. "solid fuel"
             addFakeRecipeLookup(recipeName, entity.mining_target.prototype.name, "resource", "recipe-display.mining-solid-fuel")
@@ -99,7 +99,7 @@ end
 
 
 local function enrolProducedMiningOutputs(entity, recipe)
-    if entity.type == "mining-drill" and entity.mining_target then
+    if entity.type == "mining-drill" and entity.mining_target and entity.mining_target.valid then
         local per_craft = 1
 
         for i, product in ipairs(entity.mining_target.prototype.mineable_properties.products) do
@@ -131,11 +131,46 @@ local function enrolProducedRecipeOutputs(entity, recipe, quality)
 end
 
 
+local function buildForceLabCache(force)
+    local labs = {}
+    local total_speed = 0
+    local max_partition = storage.lab_partition_data and storage.lab_partition_data.current or 1
+    for partition = 1, max_partition do
+        for unit_number, data in pairs(storage.entities_lab[partition] or {}) do
+            if data.entity.valid and data.entity.force.index == force.index then
+                local speed = 1 + data.entity.speed_bonus
+                total_speed = total_speed + speed
+                table.insert(labs, {
+                    unit_number = unit_number,
+                    surface_index = data.entity.surface_index,
+                    speed = speed,
+                    productivity_bonus = data.entity.productivity_bonus
+                })
+            end
+        end
+    end
+    for _, lab in ipairs(labs) do
+        lab.speed_fraction = total_speed > 0 and (lab.speed / total_speed) or 0
+    end
+    storage.force_lab_cache[force.index] = { total_speed = total_speed, labs = labs }
+end
+
+local function addResearchFakeRecipeLookup(tech)
+    local recipe_name = "research-"..tech.name
+    addFakeRecipeLookup(recipe_name, tech.name, "technology", "recipe-display.research")
+    for _, ingredient in ipairs(tech.research_unit_ingredients) do
+        initResults(ingredient.name, recipe_name)
+    end
+    return recipe_name
+end
+
 return {
     enrolConsumedRecipeIngredients = enrolConsumedRecipeIngredients,
     enrolConsumedMiningFluid = enrolConsumedMiningFluid,
     enrolConsumedSolidFuel = enrolConsumedSolidFuel,
     enrolConsumedFluidFuel = enrolConsumedFluidFuel,
     enrolProducedMiningOutputs = enrolProducedMiningOutputs,
-    enrolProducedRecipeOutputs = enrolProducedRecipeOutputs
+    enrolProducedRecipeOutputs = enrolProducedRecipeOutputs,
+    buildForceLabCache = buildForceLabCache,
+    addResearchFakeRecipeLookup = addResearchFakeRecipeLookup
   }

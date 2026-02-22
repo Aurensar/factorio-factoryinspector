@@ -122,9 +122,11 @@ local function flushBuffer(buffer, getTargetDB)
                 recordsInBuffer = recordsInBuffer + 1
             end
             local targetDB = getTargetDB(item, recipe)
-            for _, consolidated in pairs(byKey) do
-                recordsCreated = recordsCreated + 1
-                table.insert(targetDB, { tick = game.tick, times = consolidated.times, amount = consolidated.amount, surface_index = consolidated.surface_index, quality = consolidated.quality })
+            if targetDB then
+                for _, consolidated in pairs(byKey) do
+                    recordsCreated = recordsCreated + 1
+                    table.insert(targetDB, { tick = game.tick, times = consolidated.times, amount = consolidated.amount, surface_index = consolidated.surface_index, quality = consolidated.quality })
+                end
             end
         end
     end
@@ -132,9 +134,15 @@ local function flushBuffer(buffer, getTargetDB)
 end
 
 local function flushBuffers()
-   local total, created = flushBuffer(consumptionBuffer, function(item, recipe) return storage.results[item].consumed[recipe] end)
+   local total, created = flushBuffer(consumptionBuffer, function(item, recipe)
+       if not storage.results[item] or not storage.results[item].consumed then return nil end
+       return storage.results[item].consumed[recipe]
+   end)
    logger.log(string.format("Flushed consumption buffer of %d items, creating %d records", total, created))
-   total, created = flushBuffer(productionBuffer, function(item, recipe) return storage.results[item].produced[recipe] end)
+   total, created = flushBuffer(productionBuffer, function(item, recipe)
+       if not storage.results[item] or not storage.results[item].produced then return nil end
+       return storage.results[item].produced[recipe]
+   end)
    logger.log(string.format("Flushed production buffer of %d items, creating %d records", total, created))
    productionBuffer = {}
    consumptionBuffer = {}
@@ -147,18 +155,18 @@ local function cleanupOldResults(timeInSeconds)
 
     for item, itemDB in pairs(storage.results) do
         for recipe, recipeDB in pairs(itemDB.produced) do
-            for i, entry in ipairs(recipeDB) do
+            for i = #recipeDB, 1, -1 do
                 prodRecords = prodRecords + 1
-                if entry.tick < cleanupThresholdTick then 
+                if recipeDB[i].tick < cleanupThresholdTick then
                     table.remove(recipeDB, i)
                     recordsCleaned = recordsCleaned + 1
                 end
             end
         end
         for recipe, recipeDB in pairs(itemDB.consumed) do
-            for i, entry in ipairs(recipeDB) do
+            for i = #recipeDB, 1, -1 do
                 consRecords = consRecords + 1
-                if entry.tick < cleanupThresholdTick then 
+                if recipeDB[i].tick < cleanupThresholdTick then
                     table.remove(recipeDB, i)
                     recordsCleaned = recordsCleaned + 1
                 end

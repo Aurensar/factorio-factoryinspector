@@ -8,29 +8,37 @@ script.on_event(defines.events.on_tick, event_handlers.onGameTick)
 
 script.on_event(defines.events.on_built_entity, event_handlers.onBuiltEntity,
   {{filter="type", type = "mining-drill"},
-   {filter="type", type = "assembling-machine"}, 
-   {filter="type", type = "furnace"}})
+   {filter="type", type = "assembling-machine"},
+   {filter="type", type = "furnace"},
+   {filter="type", type = "lab"}})
 script.on_event(defines.events.on_robot_built_entity, event_handlers.onBuiltEntity,
    {{filter="type", type = "mining-drill"},
-    {filter="type", type = "assembling-machine"}, 
-    {filter="type", type = "furnace"}})
+    {filter="type", type = "assembling-machine"},
+    {filter="type", type = "furnace"},
+    {filter="type", type = "lab"}})
 script.on_event(defines.events.script_raised_built, event_handlers.onBuiltEntity,
    {{filter="type", type = "mining-drill"},
-    {filter="type", type = "assembling-machine"}, 
-    {filter="type", type = "furnace"}})
+    {filter="type", type = "assembling-machine"},
+    {filter="type", type = "furnace"},
+    {filter="type", type = "lab"}})
 
 script.on_event(defines.events.on_player_mined_entity, event_handlers.onRemovedEntity,
   {{filter="type", type = "mining-drill"},
-   {filter="type", type = "assembling-machine"}, 
-   {filter="type", type = "furnace"}})
+   {filter="type", type = "assembling-machine"},
+   {filter="type", type = "furnace"},
+   {filter="type", type = "lab"}})
 script.on_event(defines.events.on_robot_mined_entity, event_handlers.onRemovedEntity,
    {{filter="type", type = "mining-drill"},
-    {filter="type", type = "assembling-machine"}, 
-    {filter="type", type = "furnace"}})
+    {filter="type", type = "assembling-machine"},
+    {filter="type", type = "furnace"},
+    {filter="type", type = "lab"}})
 script.on_event(defines.events.script_raised_destroy, event_handlers.onRemovedEntity,
     {{filter="type", type = "mining-drill"},
-     {filter="type", type = "assembling-machine"}, 
-     {filter="type", type = "furnace"}})
+     {filter="type", type = "assembling-machine"},
+     {filter="type", type = "furnace"},
+     {filter="type", type = "lab"}})
+
+script.on_event(defines.events.on_research_started, event_handlers.onResearchStarted)
 
 script.on_event(defines.events.on_lua_shortcut, event_handlers.onLuaShortcut)
 script.on_event(defines.events.on_gui_click, event_handlers.onGuiClick)

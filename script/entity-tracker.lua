@@ -9,7 +9,7 @@ local update_timer = 0
 
 -- Bypasses the partition lookup table and scans the whole database for an id. Shouldn't be needed...
 local function deepRemoveEntity(number_to_delete, inner_database)
-    local count, am_count, furnace_count, md_count = 0, 0, 0, 0
+    local count, am_count, furnace_count, md_count, lab_count = 0, 0, 0, 0, 0
 
     for partition,data in pairs(storage.entities) do
         for unit_number, innerData in pairs(data) do
@@ -51,10 +51,20 @@ local function deepRemoveEntity(number_to_delete, inner_database)
         end
     end
 
-    logger.log(string.format("[Deep Remove %d] Occurrences: G=%d AM=%d MD=%d F=%d", number_to_delete, count, am_count, md_count, furnace_count))
+    for partition,data in pairs(storage.entities_lab) do
+        for unit_number, innerData in pairs(data) do
+            if unit_number == number_to_delete then
+                logger.log("[Deep scan] Found entity to remove in Lab partition "..partition)
+                lab_count = lab_count + 1
+                storage.entities_lab[partition][unit_number] = nil
+            end
+        end
+    end
 
-    if count > 1 or am_count > 1 or md_count > 1 or furnace_count > 1 then
-        logger.error(string.format("[Deep Remove %d] Occurrences: G=%d AM=%d MD=%d F=%d", number_to_delete, count, am_count, md_count, furnace_count))
+    logger.log(string.format("[Deep Remove %d] Occurrences: G=%d AM=%d MD=%d F=%d Lab=%d", number_to_delete, count, am_count, md_count, furnace_count, lab_count))
+
+    if count > 1 or am_count > 1 or md_count > 1 or furnace_count > 1 or lab_count > 1 then
+        logger.error(string.format("[Deep Remove %d] Occurrences: G=%d AM=%d MD=%d F=%d Lab=%d", number_to_delete, count, am_count, md_count, furnace_count, lab_count))
     end
 end
 
@@ -89,6 +99,12 @@ local function removeEntityByNumber(number)
         logger.log("Found entity to remove in furnace partition "..partition)
         storage.entities_furnace[partition][number] = nil
         storage.entities_furnace_partition_lookup[number] = nil
+    end
+    if storage.entities_lab_partition_lookup[number] then
+        partition = storage.entities_lab_partition_lookup[number]
+        logger.log("Found entity to remove in lab partition "..partition)
+        storage.entities_lab[partition][number] = nil
+        storage.entities_lab_partition_lookup[number] = nil
     end
 
     storage.consumers[number] = {}
@@ -163,6 +179,9 @@ local function enrolNewEntity(entity)
     if entity.type == "furnace" then
         addEntityToPartition(storage.entities_furnace, storage.furnace_partition_data, entity, storage.entities_furnace_partition_lookup, function(e) return { entity=e } end)
     end
+    if entity.type == "lab" then
+        addEntityToPartition(storage.entities_lab, storage.lab_partition_data, entity, storage.entities_lab_partition_lookup, function(e) return { entity=e } end)
+    end
 end
 
 local function checkEntityBatchForRecipeChanges()
@@ -170,7 +189,7 @@ local function checkEntityBatchForRecipeChanges()
         local am_count, md_count, furnace_count = 0, 0, 0
         logger.log("Re-enrolling all entities - full scan")
         for _, surface in pairs(game.surfaces) do
-            local entities =  surface.find_entities_filtered({type = {"furnace", "assembling-machine", "mining-drill"}})
+            local entities =  surface.find_entities_filtered({type = {"furnace", "assembling-machine", "mining-drill", "lab"}})
             for i, entity in ipairs(entities) do
                 enrolNewEntity(entity)
                 if entity.type == "assembling-machine" then am_count = am_count + 1 end
@@ -201,12 +220,15 @@ end
 local function checkMissingEntities()
     logger.log(string.format("Checking all surfaces for missing entities"))
     for _, surface in pairs(game.surfaces) do
-        local entities =  surface.find_entities_filtered({type = {"furnace", "assembling-machine", "mining-drill"}})
+        local entities =  surface.find_entities_filtered({type = {"furnace", "assembling-machine", "mining-drill", "lab"}})
         for i, entity in ipairs(entities) do
             local partition = storage.entities_partition_lookup[entity.unit_number]
             if not partition then
                 logger.log(string.format(string.format("Entity %d %s added to database. This entity may have been created by a mod script.", entity.unit_number, entity.name)))
                 enrolNewEntity(entity)
+                if entity.type == "lab" then
+                    input_output_calculator.buildForceLabCache(entity.force)
+                end
             end
         end
     end
@@ -216,5 +238,6 @@ return {
     checkEntityBatchForRecipeChanges = checkEntityBatchForRecipeChanges,
     enrolNewEntity = enrolNewEntity,
     removeEntity = removeEntity,
+    removeEntityByNumber = removeEntityByNumber,
     checkMissingEntities = checkMissingEntities
 }
