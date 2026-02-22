@@ -54,6 +54,12 @@ styles["fi_button_fake_listbox_item_active"] = {
 
 -- Production and consumption table styles
 
+styles["fi_table_row_icon"] = {
+    type = "image_style",
+    size = 28,
+    stretch_image_to_widget_size = true
+}
+
 styles["fi_table_sprite_heading"] = {
     type = "label_style",
     font = "default-bold",

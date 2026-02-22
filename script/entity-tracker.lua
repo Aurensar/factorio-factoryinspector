@@ -199,6 +199,19 @@ local function checkEntityBatchForRecipeChanges()
             end
             logger.log(string.format("Finished initialisation for %d entities (%d assemblers %d mining drills %d furnaces)", #entities, am_count, md_count, furnace_count))
         end
+        -- entities_lab is now populated; build lab caches and seed research state
+        -- for any force that already has research in progress
+        for _, force in pairs(game.forces) do
+            input_output_calculator.buildForceLabCache(force)
+            local tech = force.current_research
+            if tech and not storage.force_research_state[force.index] then
+                input_output_calculator.addResearchFakeRecipeLookup(tech)
+                storage.force_research_state[force.index] = {
+                    tech_name = tech.name,
+                    previous_progress = force.research_progress
+                }
+            end
+        end
     end
 
     for number, data in pairs(storage.entities[partition_being_checked]) do

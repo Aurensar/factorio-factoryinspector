@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.5
+Date: 2026-02-22
+  Bugfixes:
+    - Fixed research consumption not being tracked after a mod config change: the initial entity enrollment (entity_count == 0 path) now builds force lab caches and seeds force_research_state for any force with research already in progress, so tracking starts immediately without waiting for on_research_started to fire
+---------------------------------------------------------------------------------------------------
+Version: 2.2.4
+Date: 2026-02-22
+  Bugfixes:
+    - Fixed research technology sprite still overflowing at 256x256 despite layout size constraint; now uses a prototype image_style with stretch_image_to_widget_size=true so the image is scaled to 28x28, not just clipped
+---------------------------------------------------------------------------------------------------
 Version: 2.2.3
 Date: 2026-02-22
   Bugfixes:

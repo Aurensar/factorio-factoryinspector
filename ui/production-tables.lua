@@ -74,14 +74,12 @@ local function addSpriteWithQuality(table, sprite, quality)
         local icon_flow = table.add { type = "flow", direction = "horizontal" }
         icon_flow.style.width = 30
         icon_flow.style.height = 30
-        local rs = icon_flow.add { type = "sprite", sprite = sprite }
-        rs.style.size = {28, 28}
+        icon_flow.add { type = "sprite", sprite = sprite, style = "fi_table_row_icon" }
         local qs = icon_flow.add { type = "sprite", sprite = "quality/" .. quality }
         qs.style.size = {14, 14}
         qs.style.margin = {14, 0, 0, -14}
     else
-        local s = table.add { type = "sprite", sprite = sprite }
-        s.style.size = {28, 28}
+        table.add { type = "sprite", sprite = sprite, style = "fi_table_row_icon" }
     end
 end
 
