@@ -75,6 +75,14 @@ local function getEntityDisplayName(entity_name)
     return proto and proto.localised_name or entity_name
 end
 
+local function addEntityCell(parent, entity_name, caption)
+    local flow = parent.add { type = "flow", direction = "horizontal", style = "fi_table_entity_flow" }
+    if entity_name and entity_name ~= "" then
+        flow.add { type = "sprite", sprite = "entity/" .. entity_name, style = "fi_table_row_icon" }
+    end
+    flow.add { type = "label", caption = caption }
+end
+
 local function addSpriteWithQuality(table, sprite, quality)
     if quality and quality ~= "normal" then
         local icon_flow = table.add { type = "flow", direction = "horizontal" }
@@ -190,7 +198,7 @@ function productionTables.refreshConsumption(player)
                 or entity_display
             addSpriteWithQuality(table, sprite, entry.quality)
             table.add { type = "label", caption = combined_name, style="fi_table_text" }
-            table.add { type = "label", caption = entity_caption, style="fi_table_entity" }
+            addEntityCell(table, entry.entity_name, entity_caption)
             table.add { type = "label", caption = surface_name, style="fi_table_surface" }
             table.add { type = "label", caption = quality_name, style="fi_table_quality" }
             table.add { type = "label", caption = string.format("%d", entry.times), style="fi_table_number" }
@@ -258,7 +266,7 @@ function productionTables.refreshProduction(player)
                 or entity_display
             addSpriteWithQuality(table, sprite, entry.quality)
             table.add { type = "label", caption = combined_name, style="fi_table_text" }
-            table.add { type = "label", caption = entity_caption, style="fi_table_entity" }
+            addEntityCell(table, entry.entity_name, entity_caption)
             table.add { type = "label", caption = surface_name, style="fi_table_surface" }
             table.add { type = "label", caption = quality_name, style="fi_table_quality" }
             table.add { type = "label", caption = string.format("%d", entry.times), style="fi_table_number" }

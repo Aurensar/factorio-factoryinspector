@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.3
+Date: 2026-02-22
+  Changes:
+    - Entity column now shows the entity sprite to the left of the count and name (e.g. [sprite] 73x Assembling machine 3), matching the 28px sprite size used in the recipe column
+---------------------------------------------------------------------------------------------------
 Version: 2.3.2
 Date: 2026-02-22
   Changes:

@@ -128,10 +128,12 @@ styles["fi_table_entity_heading"] = {
     maximal_width = 180
 }
 
-styles["fi_table_entity"] = {
-    type = "label_style",
+styles["fi_table_entity_flow"] = {
+    type = "horizontal_flow_style",
     width = 180,
-    maximal_width = 180
+    maximal_width = 180,
+    vertical_align = "center",
+    horizontal_spacing = 4
 }
 
 styles["fi_table_percent_flow"] = {
