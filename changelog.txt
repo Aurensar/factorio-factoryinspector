@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.0
+Date: 2026-02-22
+  Features:
+    - Production and consumption tables now show a separate row per entity type (e.g. Assembling Machine 3 vs Electromagnetic Plant) for each recipe/surface/quality combination, with a machine count in parentheses; entity name and count are computed live from registered producers/consumers each UI refresh
+---------------------------------------------------------------------------------------------------
 Version: 2.2.7
 Date: ????
   Changes:

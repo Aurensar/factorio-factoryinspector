@@ -16,10 +16,25 @@ local function getAggregateConsumption(item, timePeriodInSeconds)
                 if resultsDB[i].tick > startTick then
                     local si = resultsDB[i].surface_index or 0
                     local q = resultsDB[i].quality or "normal"
-                    local key = recipe .. "\0" .. si .. "\0" .. q
-                    if not grouped[key] then grouped[key] = { recipe = recipe, surface_index = si, quality = q, times = 0, amount = 0 } end
+                    local entity_name = resultsDB[i].entity_name
+                    local key = recipe .. "\0" .. si .. "\0" .. q .. "\0" .. (entity_name or "")
+                    if not grouped[key] then grouped[key] = { recipe = recipe, surface_index = si, quality = q, entity_name = entity_name, times = 0, amount = 0 } end
                     grouped[key].times = grouped[key].times + resultsDB[i].times
                     grouped[key].amount = grouped[key].amount + resultsDB[i].amount
+                end
+            end
+        end
+    end
+
+    local entity_counts = {}
+    for unit_number, records in pairs(storage.consumers) do
+        local seen = {}
+        for _, rec in ipairs(records) do
+            if rec.entity.valid then
+                local ekey = rec.recipe .. "\0" .. rec.entity.name
+                if not seen[ekey] then
+                    seen[ekey] = true
+                    entity_counts[ekey] = (entity_counts[ekey] or 0) + 1
                 end
             end
         end
@@ -28,6 +43,7 @@ local function getAggregateConsumption(item, timePeriodInSeconds)
     for _, entry in pairs(grouped) do
         entry.per_sec = entry.amount / timePeriodInSeconds
         entry.per_min = entry.per_sec * 60
+        entry.entity_count = entity_counts[entry.recipe .. "\0" .. (entry.entity_name or "")] or 0
         total.times = total.times + entry.times
         total.amount = total.amount + entry.amount
         table.insert(entries, entry)
@@ -54,10 +70,25 @@ local function getAggregateProduction(item, timePeriodInSeconds)
                 if resultsDB[i].tick > startTick then
                     local si = resultsDB[i].surface_index or 0
                     local q = resultsDB[i].quality or "normal"
-                    local key = recipe .. "\0" .. si .. "\0" .. q
-                    if not grouped[key] then grouped[key] = { recipe = recipe, surface_index = si, quality = q, times = 0, amount = 0 } end
+                    local entity_name = resultsDB[i].entity_name
+                    local key = recipe .. "\0" .. si .. "\0" .. q .. "\0" .. (entity_name or "")
+                    if not grouped[key] then grouped[key] = { recipe = recipe, surface_index = si, quality = q, entity_name = entity_name, times = 0, amount = 0 } end
                     grouped[key].times = grouped[key].times + resultsDB[i].times
                     grouped[key].amount = grouped[key].amount + resultsDB[i].amount
+                end
+            end
+        end
+    end
+
+    local entity_counts = {}
+    for unit_number, records in pairs(storage.producers) do
+        local seen = {}
+        for _, rec in ipairs(records) do
+            if rec.entity.valid then
+                local ekey = rec.recipe .. "\0" .. rec.entity.name
+                if not seen[ekey] then
+                    seen[ekey] = true
+                    entity_counts[ekey] = (entity_counts[ekey] or 0) + 1
                 end
             end
         end
@@ -66,6 +97,7 @@ local function getAggregateProduction(item, timePeriodInSeconds)
     for _, entry in pairs(grouped) do
         entry.per_sec = entry.amount / timePeriodInSeconds
         entry.per_min = entry.per_sec * 60
+        entry.entity_count = entity_counts[entry.recipe .. "\0" .. (entry.entity_name or "")] or 0
         total.times = total.times + entry.times
         total.amount = total.amount + entry.amount
         table.insert(entries, entry)
@@ -88,36 +120,38 @@ local function getOrderedItemList()
     return resultsToReturn
 end
 
-local function addConsumptionData(item, recipe, times, amount, surface_index, quality)
+local function addConsumptionData(item, recipe, times, amount, surface_index, quality, entity_name)
     quality = quality or "normal"
     if not consumptionBuffer[item] then consumptionBuffer[item] = {} end
     if not consumptionBuffer[item][recipe] then consumptionBuffer[item][recipe] = {} end
     if not consumptionBuffer[item].total then consumptionBuffer[item].total = {} end
-    local key = (surface_index or 0) .. "\0" .. quality
+    local entity_key = (entity_name or "") .. "\0" .. (surface_index or 0) .. "\0" .. quality
+    local total_key = (surface_index or 0) .. "\0" .. quality
     local r = consumptionBuffer[item][recipe]
-    if not r[key] then r[key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality } end
-    r[key].times  = r[key].times  + times
-    r[key].amount = r[key].amount + amount
+    if not r[entity_key] then r[entity_key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality, entity_name = entity_name } end
+    r[entity_key].times  = r[entity_key].times  + times
+    r[entity_key].amount = r[entity_key].amount + amount
     local t = consumptionBuffer[item].total
-    if not t[key] then t[key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality } end
-    t[key].times  = t[key].times  + times
-    t[key].amount = t[key].amount + amount
+    if not t[total_key] then t[total_key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality } end
+    t[total_key].times  = t[total_key].times  + times
+    t[total_key].amount = t[total_key].amount + amount
 end
 
-local function addProductionData(item, recipe, times, amount, surface_index, quality)
+local function addProductionData(item, recipe, times, amount, surface_index, quality, entity_name)
     quality = quality or "normal"
     if not productionBuffer[item] then productionBuffer[item] = {} end
     if not productionBuffer[item][recipe] then productionBuffer[item][recipe] = {} end
     if not productionBuffer[item].total then productionBuffer[item].total = {} end
-    local key = (surface_index or 0) .. "\0" .. quality
+    local entity_key = (entity_name or "") .. "\0" .. (surface_index or 0) .. "\0" .. quality
+    local total_key = (surface_index or 0) .. "\0" .. quality
     local r = productionBuffer[item][recipe]
-    if not r[key] then r[key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality } end
-    r[key].times  = r[key].times  + times
-    r[key].amount = r[key].amount + amount
+    if not r[entity_key] then r[entity_key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality, entity_name = entity_name } end
+    r[entity_key].times  = r[entity_key].times  + times
+    r[entity_key].amount = r[entity_key].amount + amount
     local t = productionBuffer[item].total
-    if not t[key] then t[key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality } end
-    t[key].times  = t[key].times  + times
-    t[key].amount = t[key].amount + amount
+    if not t[total_key] then t[total_key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality } end
+    t[total_key].times  = t[total_key].times  + times
+    t[total_key].amount = t[total_key].amount + amount
 end
 
 local function flushBuffer(buffer, getTargetDB)
@@ -128,7 +162,7 @@ local function flushBuffer(buffer, getTargetDB)
             if targetDB then
                 for _, consolidated in pairs(recipeDB) do
                     recordsCreated = recordsCreated + 1
-                    table.insert(targetDB, { tick = game.tick, times = consolidated.times, amount = consolidated.amount, surface_index = consolidated.surface_index, quality = consolidated.quality })
+                    table.insert(targetDB, { tick = game.tick, times = consolidated.times, amount = consolidated.amount, surface_index = consolidated.surface_index, quality = consolidated.quality, entity_name = consolidated.entity_name })
                 end
             end
         end

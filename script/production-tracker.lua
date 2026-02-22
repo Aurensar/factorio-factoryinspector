@@ -26,12 +26,13 @@ local function updateProductionAndConsumptionStatsAM()
             local surface_index = data.entity.surface_index
             local result_quality = data.entity.result_quality
             local production_quality = result_quality and result_quality.name or nil
+            local entity_name = data.entity.name
             for i, producer in ipairs(storage.producers[unit_number] or {}) do
-                results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount, surface_index, production_quality or producer.quality)
+                results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount, surface_index, production_quality or producer.quality, entity_name)
             end
             local consumption_diff = diff / (1 + data.entity.productivity_bonus)
             for j, consumer in ipairs(storage.consumers[unit_number] or {}) do
-                results.addConsumptionData(consumer.item, consumer.recipe, consumption_diff, consumption_diff*consumer.amount, surface_index, consumer.quality)
+                results.addConsumptionData(consumer.item, consumer.recipe, consumption_diff, consumption_diff*consumer.amount, surface_index, consumer.quality, entity_name)
             end
         end
 
@@ -57,12 +58,13 @@ local function updateProductionAndConsumptionStatsFurnace()
             local surface_index = data.entity.surface_index
             local result_quality = data.entity.result_quality
             local production_quality = result_quality and result_quality.name or nil
+            local entity_name = data.entity.name
             for i, producer in ipairs(storage.producers[unit_number] or {}) do
-                results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount, surface_index, production_quality or producer.quality)
+                results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount, surface_index, production_quality or producer.quality, entity_name)
             end
             local consumption_diff = diff / (1 + data.entity.productivity_bonus)
             for j, consumer in ipairs(storage.consumers[unit_number] or {}) do
-                results.addConsumptionData(consumer.item, consumer.recipe, consumption_diff, consumption_diff*consumer.amount, surface_index, consumer.quality)
+                results.addConsumptionData(consumer.item, consumer.recipe, consumption_diff, consumption_diff*consumer.amount, surface_index, consumer.quality, entity_name)
             end
         end
         if not data.entity.valid then
@@ -90,11 +92,12 @@ local function updateProductionAndConsumptionStatsMD()
                 if mining_target and mining_target.valid and mining_target.prototype.infinite_resource then
                     yield_multiplier = mining_target.amount / mining_target.prototype.normal_resource_amount
                 end
+                local entity_name = data.entity.name
                 for i, producer in ipairs(storage.producers[unit_number] or {}) do
-                    results.addProductionData(producer.item, producer.recipe, 1, producer.amount * productivity_multiplier * yield_multiplier, surface_index, producer.quality)
+                    results.addProductionData(producer.item, producer.recipe, 1, producer.amount * productivity_multiplier * yield_multiplier, surface_index, producer.quality, entity_name)
                 end
                 for j, consumer in ipairs(storage.consumers[unit_number] or {}) do
-                    results.addConsumptionData(consumer.item, consumer.recipe, 1, consumer.amount, surface_index, consumer.quality)
+                    results.addConsumptionData(consumer.item, consumer.recipe, 1, consumer.amount, surface_index, consumer.quality, entity_name)
                 end
             end
             if data.entity.valid then data.previous_progress = data.entity.mining_progress end
@@ -121,7 +124,7 @@ local function updateResearchConsumption()
                             local fractional_units = delta * unit_count * lab_info.speed_fraction
                             for _, ingredient in ipairs(tech.research_unit_ingredients) do
                                 local amount = fractional_units * ingredient.amount / (1 + lab_info.productivity_bonus)
-                                results.addConsumptionData(ingredient.name, recipe_name, fractional_units, amount, lab_info.surface_index, "normal")
+                                results.addConsumptionData(ingredient.name, recipe_name, fractional_units, amount, lab_info.surface_index, "normal", lab_info.entity_name)
                             end
                         end
                     end

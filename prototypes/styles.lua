@@ -121,6 +121,19 @@ styles["fi_table_quality"] = {
     maximal_width = 100
 }
 
+styles["fi_table_entity_heading"] = {
+    type = "label_style",
+    font = "default-bold",
+    width = 180,
+    maximal_width = 180
+}
+
+styles["fi_table_entity"] = {
+    type = "label_style",
+    width = 180,
+    maximal_width = 180
+}
+
 styles["fi_table_percent_flow"] = {
     type = "horizontal_flow_style",
     width = 120,

@@ -144,7 +144,8 @@ local function buildForceLabCache(force)
                     unit_number = unit_number,
                     surface_index = data.entity.surface_index,
                     speed = speed,
-                    productivity_bonus = data.entity.productivity_bonus
+                    productivity_bonus = data.entity.productivity_bonus,
+                    entity_name = data.entity.name
                 })
             end
         end
