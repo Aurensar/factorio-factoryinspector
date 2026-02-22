@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.6
+Date: 2026-02-22
+  Performance:
+    - Fixed 500ms hitch every 5 seconds: production/consumption buffers now pre-aggregate stats by (surface, quality) on insertion rather than accumulating thousands of individual timestamped records; flushBuffers() is now O(unique item×recipe×surface/quality combos) instead of O(total craft events over 300 ticks)
+---------------------------------------------------------------------------------------------------
 Version: 2.2.5
 Date: 2026-02-22
   Bugfixes:

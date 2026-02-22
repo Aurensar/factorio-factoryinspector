@@ -93,8 +93,15 @@ local function addConsumptionData(item, recipe, times, amount, surface_index, qu
     if not consumptionBuffer[item] then consumptionBuffer[item] = {} end
     if not consumptionBuffer[item][recipe] then consumptionBuffer[item][recipe] = {} end
     if not consumptionBuffer[item].total then consumptionBuffer[item].total = {} end
-    table.insert(consumptionBuffer[item][recipe], { tick = game.tick, times = times, amount = amount, surface_index = surface_index, quality = quality })
-    table.insert(consumptionBuffer[item].total, { tick = game.tick, times = times, amount = amount, surface_index = surface_index, quality = quality })
+    local key = (surface_index or 0) .. "\0" .. quality
+    local r = consumptionBuffer[item][recipe]
+    if not r[key] then r[key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality } end
+    r[key].times  = r[key].times  + times
+    r[key].amount = r[key].amount + amount
+    local t = consumptionBuffer[item].total
+    if not t[key] then t[key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality } end
+    t[key].times  = t[key].times  + times
+    t[key].amount = t[key].amount + amount
 end
 
 local function addProductionData(item, recipe, times, amount, surface_index, quality)
@@ -102,48 +109,44 @@ local function addProductionData(item, recipe, times, amount, surface_index, qua
     if not productionBuffer[item] then productionBuffer[item] = {} end
     if not productionBuffer[item][recipe] then productionBuffer[item][recipe] = {} end
     if not productionBuffer[item].total then productionBuffer[item].total = {} end
-    table.insert(productionBuffer[item][recipe], { tick = game.tick, times = times, amount = amount, surface_index = surface_index, quality = quality })
-    table.insert(productionBuffer[item].total, { tick = game.tick, times = times, amount = amount, surface_index = surface_index, quality = quality })
+    local key = (surface_index or 0) .. "\0" .. quality
+    local r = productionBuffer[item][recipe]
+    if not r[key] then r[key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality } end
+    r[key].times  = r[key].times  + times
+    r[key].amount = r[key].amount + amount
+    local t = productionBuffer[item].total
+    if not t[key] then t[key] = { times = 0, amount = 0, surface_index = surface_index, quality = quality } end
+    t[key].times  = t[key].times  + times
+    t[key].amount = t[key].amount + amount
 end
 
 local function flushBuffer(buffer, getTargetDB)
-    local recordsInBuffer, recordsCreated = 0, 0
+    local recordsCreated = 0
     for item, itemDB in pairs(buffer) do
         for recipe, recipeDB in pairs(itemDB) do
-            -- Group records by (surface_index, quality) before consolidating
-            local byKey = {}
-            for i, record in ipairs(recipeDB) do
-                local si = record.surface_index
-                local q = record.quality or "normal"
-                local key = si .. "\0" .. q
-                if not byKey[key] then byKey[key] = { times = 0, amount = 0, surface_index = si, quality = q } end
-                byKey[key].times = byKey[key].times + record.times
-                byKey[key].amount = byKey[key].amount + record.amount
-                recordsInBuffer = recordsInBuffer + 1
-            end
             local targetDB = getTargetDB(item, recipe)
             if targetDB then
-                for _, consolidated in pairs(byKey) do
+                for _, consolidated in pairs(recipeDB) do
                     recordsCreated = recordsCreated + 1
                     table.insert(targetDB, { tick = game.tick, times = consolidated.times, amount = consolidated.amount, surface_index = consolidated.surface_index, quality = consolidated.quality })
                 end
             end
         end
     end
-    return recordsInBuffer, recordsCreated
+    return recordsCreated
 end
 
 local function flushBuffers()
-   local total, created = flushBuffer(consumptionBuffer, function(item, recipe)
+   local created = flushBuffer(consumptionBuffer, function(item, recipe)
        if not storage.results[item] or not storage.results[item].consumed then return nil end
        return storage.results[item].consumed[recipe]
    end)
-   logger.log(string.format("Flushed consumption buffer of %d items, creating %d records", total, created))
-   total, created = flushBuffer(productionBuffer, function(item, recipe)
+   logger.log(string.format("Flushed consumption buffer, creating %d records", created))
+   created = flushBuffer(productionBuffer, function(item, recipe)
        if not storage.results[item] or not storage.results[item].produced then return nil end
        return storage.results[item].produced[recipe]
    end)
-   logger.log(string.format("Flushed production buffer of %d items, creating %d records", total, created))
+   logger.log(string.format("Flushed production buffer, creating %d records", created))
    productionBuffer = {}
    consumptionBuffer = {}
 end
