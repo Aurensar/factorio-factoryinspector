@@ -186,7 +186,7 @@ function productionTables.refreshConsumption(player)
             local quality_name = getQualityDisplayName(entry.quality or "normal")
             local entity_display = getEntityDisplayName(entry.entity_name)
             local entity_caption = (entry.entity_count and entry.entity_count > 0)
-                and {"", entity_display, " (", tostring(entry.entity_count), ")"}
+                and {"", tostring(entry.entity_count), "x ", entity_display}
                 or entity_display
             addSpriteWithQuality(table, sprite, entry.quality)
             table.add { type = "label", caption = combined_name, style="fi_table_text" }
@@ -254,7 +254,7 @@ function productionTables.refreshProduction(player)
             local quality_name = getQualityDisplayName(entry.quality or "normal")
             local entity_display = getEntityDisplayName(entry.entity_name)
             local entity_caption = (entry.entity_count and entry.entity_count > 0)
-                and {"", entity_display, " (", tostring(entry.entity_count), ")"}
+                and {"", tostring(entry.entity_count), "x ", entity_display}
                 or entity_display
             addSpriteWithQuality(table, sprite, entry.quality)
             table.add { type = "label", caption = combined_name, style="fi_table_text" }

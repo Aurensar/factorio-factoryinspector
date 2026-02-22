@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.2
+Date: 2026-02-22
+  Changes:
+    - Entity count in production/consumption tables now displays as "73x Assembling machine 3" instead of "Assembling machine 3 (73)"
+---------------------------------------------------------------------------------------------------
 Version: 2.3.1
 Date: 2026-02-22
   Bugfixes:
