@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.1
+Date: 2026-02-22
+  Bugfixes:
+    - Fixed entity count in production/consumption tables showing the total across all surfaces instead of per-surface count; count key now includes surface_index so each planet/platform row shows only the machines on that surface
+---------------------------------------------------------------------------------------------------
 Version: 2.3.0
 Date: 2026-02-22
   Features:

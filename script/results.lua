@@ -31,7 +31,7 @@ local function getAggregateConsumption(item, timePeriodInSeconds)
         local seen = {}
         for _, rec in ipairs(records) do
             if rec.entity.valid then
-                local ekey = rec.recipe .. "\0" .. rec.entity.name
+                local ekey = rec.recipe .. "\0" .. rec.entity.name .. "\0" .. rec.entity.surface_index
                 if not seen[ekey] then
                     seen[ekey] = true
                     entity_counts[ekey] = (entity_counts[ekey] or 0) + 1
@@ -43,7 +43,7 @@ local function getAggregateConsumption(item, timePeriodInSeconds)
     for _, entry in pairs(grouped) do
         entry.per_sec = entry.amount / timePeriodInSeconds
         entry.per_min = entry.per_sec * 60
-        entry.entity_count = entity_counts[entry.recipe .. "\0" .. (entry.entity_name or "")] or 0
+        entry.entity_count = entity_counts[entry.recipe .. "\0" .. (entry.entity_name or "") .. "\0" .. (entry.surface_index or 0)] or 0
         total.times = total.times + entry.times
         total.amount = total.amount + entry.amount
         table.insert(entries, entry)
@@ -85,7 +85,7 @@ local function getAggregateProduction(item, timePeriodInSeconds)
         local seen = {}
         for _, rec in ipairs(records) do
             if rec.entity.valid then
-                local ekey = rec.recipe .. "\0" .. rec.entity.name
+                local ekey = rec.recipe .. "\0" .. rec.entity.name .. "\0" .. rec.entity.surface_index
                 if not seen[ekey] then
                     seen[ekey] = true
                     entity_counts[ekey] = (entity_counts[ekey] or 0) + 1
@@ -97,7 +97,7 @@ local function getAggregateProduction(item, timePeriodInSeconds)
     for _, entry in pairs(grouped) do
         entry.per_sec = entry.amount / timePeriodInSeconds
         entry.per_min = entry.per_sec * 60
-        entry.entity_count = entity_counts[entry.recipe .. "\0" .. (entry.entity_name or "")] or 0
+        entry.entity_count = entity_counts[entry.recipe .. "\0" .. (entry.entity_name or "") .. "\0" .. (entry.surface_index or 0)] or 0
         total.times = total.times + entry.times
         total.amount = total.amount + entry.amount
         table.insert(entries, entry)
