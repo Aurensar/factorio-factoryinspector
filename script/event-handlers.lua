@@ -65,6 +65,15 @@ local function onGameTick(event)
         This typically happens when other mods create entities via script.
         Some common mods do not fire https://lua-api.factorio.com/latest/events.html#script_raised_built which would prevent the need for this additional check.
     ]]
+    -- Safety: initialize RS storage tables if missing (saves created before v2.3.4)
+    if not storage.entities_rs then
+        storage.entities_rs = {[1] = {}}
+        storage.entities_rs_partition_lookup = {}
+        storage.rs_partition_data = { current = 1, size = 0, max_size = 10}
+        storage.entity_count = 0
+        logger.log2("Migrated storage: added rocket silo tracking tables, triggering entity re-enrollment")
+    end
+
     entity_tracker.checkEntityBatchForRecipeChanges()
     if game.tick % 3600 == 0 then
         entity_tracker.checkMissingEntities()
