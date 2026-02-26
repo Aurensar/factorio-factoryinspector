@@ -16,6 +16,8 @@ local function init()
     storage.entities_furnace[1] = {}
     storage.entities_lab = {}
     storage.entities_lab[1] = {}
+    storage.entities_rs = {}
+    storage.entities_rs[1] = {}
 
     -- Reset the partition lookup tables
     storage.entities_partition_lookup = {}
@@ -23,6 +25,7 @@ local function init()
     storage.entities_md_partition_lookup = {}
     storage.entities_furnace_partition_lookup = {}
     storage.entities_lab_partition_lookup = {}
+    storage.entities_rs_partition_lookup = {}
 
     -- Reset the tracked production/consumption calculations
     storage.consumers = {}
@@ -41,6 +44,7 @@ local function init()
     storage.md_partition_data = { current = 1, size = 0, max_size = 20}
     storage.furnace_partition_data = { current = 1, size = 0, max_size = 10}
     storage.lab_partition_data = { current = 1, size = 0, max_size = 10}
+    storage.rs_partition_data = { current = 1, size = 0, max_size = 10}
 
     -- Force-level research tracking
     storage.force_research_state = {}

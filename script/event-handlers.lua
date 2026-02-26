@@ -73,6 +73,7 @@ local function onGameTick(event)
     production_tracker.updateProductionAndConsumptionStatsAM()
     production_tracker.updateProductionAndConsumptionStatsFurnace()
     production_tracker.updateProductionAndConsumptionStatsMD()
+    production_tracker.updateProductionAndConsumptionStatsRS()
     production_tracker.updateResearchConsumption()
 
     if game.tick % 60 == 0 then

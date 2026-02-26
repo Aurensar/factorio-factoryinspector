@@ -3,6 +3,7 @@ local results = require "script.results"
 
 local current_am_partition = 1
 local current_furnace_partition = 1
+local current_rs_partition = 1
 
 local am_start_tick = 1
 local furnace_start_tick = 1
@@ -105,6 +106,35 @@ local function updateProductionAndConsumptionStatsMD()
     end
 end
 
+local function updateProductionAndConsumptionStatsRS()
+    for unit_number, data in pairs(storage.entities_rs[current_rs_partition]) do
+        if data.entity.valid and data.previous_count and data.entity.products_finished and data.entity.products_finished > data.previous_count then
+            local diff = data.entity.products_finished - data.previous_count
+            local surface_index = data.entity.surface_index
+            local result_quality = data.entity.result_quality
+            local production_quality = result_quality and result_quality.name or nil
+            local entity_name = data.entity.name
+            for i, producer in ipairs(storage.producers[unit_number] or {}) do
+                results.addProductionData(producer.item, producer.recipe, diff, diff*producer.amount, surface_index, production_quality or producer.quality, entity_name)
+            end
+            local consumption_diff = diff / (1 + data.entity.productivity_bonus)
+            for j, consumer in ipairs(storage.consumers[unit_number] or {}) do
+                results.addConsumptionData(consumer.item, consumer.recipe, consumption_diff, consumption_diff*consumer.amount, surface_index, consumer.quality, entity_name)
+            end
+        end
+        if not data.entity.valid then
+            logger.error(string.format("Rocket silo (unit number %d) has become invalid. Please report this error to the mod author", unit_number))
+        else
+            data.previous_count = data.entity.products_finished
+        end
+    end
+
+    current_rs_partition = current_rs_partition + 1
+    if current_rs_partition > storage.rs_partition_data.current then
+        current_rs_partition = 1
+    end
+end
+
 local function updateResearchConsumption()
     for force_index, state in pairs(storage.force_research_state) do
         local force = game.forces[force_index]
@@ -139,5 +169,6 @@ return {
     updateProductionAndConsumptionStatsAM = updateProductionAndConsumptionStatsAM,
     updateProductionAndConsumptionStatsMD = updateProductionAndConsumptionStatsMD,
     updateProductionAndConsumptionStatsFurnace = updateProductionAndConsumptionStatsFurnace,
+    updateProductionAndConsumptionStatsRS = updateProductionAndConsumptionStatsRS,
     updateResearchConsumption = updateResearchConsumption
 }
