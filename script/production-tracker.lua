@@ -109,7 +109,11 @@ end
 local function updateProductionAndConsumptionStatsRS()
     for unit_number, data in pairs(storage.entities_rs[current_rs_partition]) do
         if data.entity.valid and data.previous_count and data.entity.products_finished and data.entity.products_finished > data.previous_count then
-            local diff = data.entity.products_finished - data.previous_count
+            -- products_finished increments once per completed rocket launch, not per rocket part.
+            -- Multiply by rocket_parts_required to get the actual number of recipe cycles (parts) assembled.
+            local launches = data.entity.products_finished - data.previous_count
+            local parts_per_rocket = data.entity.prototype.rocket_parts_required or 1
+            local diff = launches * parts_per_rocket
             local surface_index = data.entity.surface_index
             local result_quality = data.entity.result_quality
             local production_quality = result_quality and result_quality.name or nil
